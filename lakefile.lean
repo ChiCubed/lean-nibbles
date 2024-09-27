@@ -3,6 +3,7 @@ open Lake DSL
 
 package «chis-nibbles» where
   leanOptions := #[
+    -- feeling open-minded
     ⟨`autoImplicit, false⟩
   ]
   moreServerOptions := #[
@@ -16,3 +17,5 @@ require "leanprover-community" / "mathlib" @ git "master"
 
 @[default_target]
 lean_lib ChisNibbles
+
+lean_lib Utils
