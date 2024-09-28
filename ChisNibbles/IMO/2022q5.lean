@@ -7,9 +7,9 @@ import Mathlib.Algebra.BigOperators.Intervals
 open Nat Finset
 open scoped Nat
 
-namespace IMO
+namespace IMO.«2022»
 
-namespace «2022».q5
+namespace q5
 
 -- i had this back in the day,
 -- but it's slightly inconvenient to work with
@@ -81,10 +81,10 @@ abbrev sorted_to_finset
 
 def soln_set : Finset (ℕ × ℕ × ℕ) := {(2, 2, 2), (3, 4, 3)}
 
-end «2022».q5
+end q5
 
-open «2022».q5 in
-theorem «2022».q5 (a b p : ℕ) :
+open q5 in
+theorem q5 (a b p : ℕ) :
     0 < a ∧ 0 < b ∧ 0 < p ∧ p.Prime ∧ a^p = b ! + p ↔
     (a, b, p) ∈ soln_set := by
   constructor
@@ -245,4 +245,4 @@ theorem «2022».q5 (a b p : ℕ) :
 
   rwa [pow_two, ← h, mul_dvd_mul_iff_left (by omega)]
 
-end IMO
+end IMO.«2022»
