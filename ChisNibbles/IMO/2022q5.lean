@@ -79,9 +79,10 @@ abbrev sorted_to_finset
     Finset α :=
   ⟨l, h.nodup⟩
 
-def soln_set : Finset (ℕ × ℕ × ℕ) := {(2, 2, 2), (3, 4, 3)}
-
 end q5
+
+
+def q5.soln_set : Finset (ℕ × ℕ × ℕ) := {(2, 2, 2), (3, 4, 3)}
 
 open q5 in
 theorem q5 (a b p : ℕ) :
