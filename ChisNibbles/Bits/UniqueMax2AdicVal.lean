@@ -2,7 +2,7 @@ import Mathlib
 
 /-
 In a nonempty interval of positive naturals,
-there's a unique minimum 2-adic valuation.
+there's a unique maximum 2-adic valuation.
 -/
 
 
