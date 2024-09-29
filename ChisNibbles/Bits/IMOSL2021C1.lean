@@ -1,7 +1,7 @@
 import Mathlib
 
 /-
-A formalisation of the main solution ingredient for IMO 2021 shortlist C1
+A formalisation of the main solution ingredient for IMO Shortlist 2021 C1
 -/
 
 open Set
