@@ -130,8 +130,7 @@ noncomputable section defs
 
   def F₀.poly : F₀[X] := X ^ 2 + X + C T
 
-  -- equivalent characterisation:
-  -- F is the union of odd degree extensions of F₀
+  -- another choice for F which works is a maximal odd subextension of F₀
   def F' : ℕ → IntermediateField F₀ (AlgebraicClosure F₀)
     | 0 => ⊥
     | n + 1 => .restrictScalars F₀ $ .adjoin (F' n) {x | ∃ p, Odd p ∧ p.Prime ∧ x ^ p ∈ F' n}
