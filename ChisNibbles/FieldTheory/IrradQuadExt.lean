@@ -508,7 +508,7 @@ class inductive IsSimpleRadicalExtension
 structure Construction.Finale where
   (F : Type*) [hF : Field F]
   (E : Type*) [hE : Field E] [hFE : Algebra F E]
-  quadratic : FiniteDimensional.finrank F E = 2
+  quadratic : Module.finrank F E = 2
   not_radical : ¬ IsSimpleRadicalExtension F E
 
 open IntermediateField in

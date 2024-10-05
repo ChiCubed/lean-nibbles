@@ -56,6 +56,6 @@ example (n : ℕ) (hn : 4 ≤ n) :
   . rw [← div_lt_div_right (c := (n ^ n * (n + 1) : ℚ)) (by positivity)]
     convert this using 1 <;> field_simp <;> ring
   have hn' : (n - 1 : ℚ) < n ^ 2 / (n + 1)
-  . rw [lt_div_iff (by positivity)]; nlinarith
+  . rw [lt_div_iff₀ (by positivity)]; nlinarith
   apply (free_e n).trans_le ?_ |>.trans hn'
   qify at hn; linarith

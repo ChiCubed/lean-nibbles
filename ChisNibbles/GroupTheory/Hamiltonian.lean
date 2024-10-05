@@ -1,6 +1,7 @@
 import Mathlib.Algebra.Group.Basic
 import Mathlib.Algebra.Category.Grp.Basic
 import Mathlib.Algebra.Category.ModuleCat.Basic
+import Mathlib.Algebra.Module.ZMod
 import Mathlib.GroupTheory.SpecificGroups.Quaternion
 import Mathlib.GroupTheory.OrderOfElement
 import Mathlib.GroupTheory.NoncommPiCoprod
@@ -9,7 +10,6 @@ import Mathlib.Algebra.Group.Commutator
 import Mathlib.LinearAlgebra.Basis.VectorSpace
 import Mathlib.RingTheory.Multiplicity
 import Mathlib.Data.Nat.Choose.Basic
-import Mathlib.Data.ZMod.Module
 
 /-!
 # Hamiltonian groups

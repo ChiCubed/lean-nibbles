@@ -24,8 +24,9 @@ theorem crystalrem (n : ℕ) : ¬ n.sqrt ^ 2 + 2 ∣ n ^ 2 + 1 := by
       -- wtf, apparently in current Lean "decide" can't prove ¬ IsSquare 3.
       -- I think it gets stuck on computing Nat.sqrt 3? anyway, :(
       simp_rw [IsSquare, eq_comm, Nat.exists_mul_self]
-      convert_to ¬ 1 * 1 = 3
-      decide
+      -- this is so rip
+      have bob : Nat.sqrt 3 = 1 := by simp [Nat.sqrt, Nat.sqrt.iter]
+      rw [bob]; decide
     . absurd s_pos.ne'
       simpa using h
   rcases h with ⟨m, h⟩

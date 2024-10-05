@@ -18,4 +18,4 @@ require "leanprover-community" / "mathlib" @ git "master"
 @[default_target]
 lean_lib ChisNibbles
 
-lean_lib Utils
+-- lean_lib Utils
