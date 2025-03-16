@@ -1,7 +1,6 @@
 import Mathlib
 
 open Polynomial
-open scoped algebraMap
 
 
 namespace Polynomial
