@@ -62,7 +62,7 @@ instance {k} : Unique (UpTo 0 k) where
     rw [← nonempty_iff_ne_empty] at ha
     suffices 0 < ∑ p ∈ a.parts, p ^ 3 by simpa [a.sum_parts]
     apply sum_pos _ ha
-    exact fun i hi => pow_pos (a.parts_bdd i hi).1 3
+    exact fun i hi => Nat.pow_pos (a.parts_bdd i hi).1
 
 abbrev pushDown.ty n k :=
   match k with
@@ -150,7 +150,7 @@ def equivUpTo n k (h : n ≤ k ^ 3) : CubeyParty n ≃ UpTo n k where
     { parts := a.parts
       parts_bdd := fun p hp => by
         refine ⟨a.parts_pos _ hp, ?_⟩
-        rw [← Nat.pow_le_pow_iff_left (show 3 ≠ 0 by norm_num)]
+        rw [← Nat.pow_le_pow_iff_left (show 3 ≠ 0 by decide)]
         exact h.trans' $ a.sum_parts ▸ single_le_sum (fun i _ => zero_le (i ^ 3)) hp
       sum_parts := a.sum_parts }
   invFun a :=
@@ -171,10 +171,6 @@ theorem tada :
     exact equivUpTo _ _ hn |>.cardinal_eq
   conv => arg 1; ext n; intro hn; rw [h n hn.le]
   rw [h 216 le_rfl]
-  -- Not sure wtf norm_cast does if I run it by itself here,
-  -- but it goes over the (base) max recursion depth??
-  conv => arg 1; norm_cast
-  conv => arg 2; norm_cast
-  decide
+  norm_cast
 
 end CubeyParty

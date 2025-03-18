@@ -25,7 +25,7 @@ example (n : ℕ) (hn : 5 ≤ n) :
 here's the old proof.
 -/
 
-lemma geo_two_lt {n : ℕ} : ∑ k in Finset.range n, (1 / 2 ^ k : ℚ) < 2 := by
+lemma geo_two_lt {n : ℕ} : ∑ k ∈ Finset.range n, (1 / 2 ^ k : ℚ) < 2 := by
   simp_rw [← one_div_pow]
   rw [geom_sum_eq, div_lt_iff_of_neg, lt_sub_iff_add_lt]
   all_goals { norm_num }
@@ -35,10 +35,10 @@ theorem free_e (n : ℕ) : (1 + 1 / n : ℚ) ^ n <3 := by
   . norm_num
   qify at n_pos
   rw [add_comm, add_pow, Finset.sum_range_succ']
-  suffices : ∑ k in Finset.range n, (n.choose (k + 1) / n ^ (k + 1) : ℚ) + 1 < 3
+  suffices : ∑ k ∈ Finset.range n, (n.choose (k + 1) / n ^ (k + 1) : ℚ) + 1 < 3
   . norm_num; field_simp; exact this
   apply add_lt_of_lt_sub_right; norm_num1
-  suffices _ ≤ ∑ k in Finset.range n, (1 / 2 ^ k : ℚ) from this.trans_lt geo_two_lt
+  suffices _ ≤ ∑ k ∈ Finset.range n, (1 / 2 ^ k : ℚ) from this.trans_lt geo_two_lt
   apply Finset.sum_le_sum
   rintro k -
   rw [div_le_iff₀' (by positivity), mul_one_div]
@@ -53,7 +53,7 @@ example (n : ℕ) (hn : 4 ≤ n) :
     (n + 1) ^ (n + 1) < n ^ (n + 2) := by
   qify
   suffices : (1 + 1 / n : ℚ) ^ n < n ^ 2 / (n + 1)
-  . rw [← div_lt_div_right (c := (n ^ n * (n + 1) : ℚ)) (by positivity)]
+  . rw [← div_lt_div_iff_of_pos_right (c := (n ^ n * (n + 1) : ℚ)) (by positivity)]
     convert this using 1 <;> field_simp <;> ring
   have hn' : (n - 1 : ℚ) < n ^ 2 / (n + 1)
   . rw [lt_div_iff₀ (by positivity)]; nlinarith

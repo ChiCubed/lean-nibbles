@@ -30,20 +30,20 @@ set_option autoImplicit true
 
 theorem Finset.prod_abs
   [LinearOrderedCommRing β] {ι : Type*} (s : Finset ι) (f : ι → β) :
-    |∏ i in s, f i| = ∏ i in s, |f i| := by
+    |∏ i ∈ s, f i| = ∏ i ∈ s, |f i| := by
   induction s using Finset.cons_induction <;> simp [abs_mul, *]
 
 theorem aux
   {ι : Type*} (s : Finset ι)
   (x : ι → ℝ)
   (hx : ∀ i ∈ s, 0 ≤ x i) :
-    2 ≤ ∏ i in s, (1 + x i) + ∏ i in s, (1 - x i) := by
+    2 ≤ ∏ i ∈ s, (1 + x i) + ∏ i ∈ s, (1 - x i) := by
   induction s using Finset.cons_induction with
   | empty => norm_num
   | @cons a s ha ih =>
     simp_rw [Finset.mem_cons, forall_eq_or_imp] at hx
     simp_rw [Finset.prod_cons]
-    suffices ∏ i in s, (1 - x i) ≤ ∏ i in s, (1 + x i) by
+    suffices ∏ i ∈ s, (1 - x i) ≤ ∏ i ∈ s, (1 + x i) by
       linarith [mul_le_mul_of_nonneg_left this hx.1, ih hx.2]
     apply le_of_abs_le
     simp_rw [Finset.prod_abs]

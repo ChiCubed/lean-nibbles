@@ -17,16 +17,16 @@ lemma your_name
 lemma flippy
   (f : ℕ → ℕ) (s : Finset ℕ)
   (m : ℕ) (hf : ∀ i ∈ s, f i ≤ m) :
-    ∑ i in s, f i =
-    ∑ j in Icc 1 m, card (s.filter (j ≤ f ·)) := by
+    ∑ i ∈ s, f i =
+    ∑ j ∈ Icc 1 m, card (s.filter (j ≤ f ·)) := by
   rw [sum_congr rfl fun i hi => your_name _ m (hf i hi)]
   simp_rw [card_filter]
   rw [sum_comm]
 
 -- this is so sloppy but w/e
 theorem flippysum (n : ℕ) (hn : n ≥ 2) :
-    ∑ k in .Icc 2 n, ⌊Real.logb k n⌋ =
-    ∑ k in .Icc 2 n, ⌊(n : ℝ) ^ (1 / k : ℝ)⌋ := by
+    ∑ k ∈ .Icc 2 n, ⌊Real.logb k n⌋ =
+    ∑ k ∈ .Icc 2 n, ⌊(n : ℝ) ^ (1 / k : ℝ)⌋ := by
   conv_lhs =>
     arg 2
     ext k
@@ -48,7 +48,7 @@ theorem flippysum (n : ℕ) (hn : n ≥ 2) :
       apply Real.rpow_le_rpow_of_exponent_le
       . norm_cast; omega
       . rw [one_div]
-        rw [inv_le_one₀] <;> norm_cast <;> omega
+        rw [inv_le_one₀] <;> norm_cast
     congr
     ext x
     rw [Nat.le_floor_iff (by positivity), one_div]

@@ -133,7 +133,7 @@ private def p (n : ℕ) : I :=
     rw [Set.mem_Icc]
     constructor
     . positivity
-    . apply zpow_le_one_of_nonpos <;> linarith⟩
+    . apply zpow_le_one_of_nonpos₀ <;> linarith⟩
 
 @[simp]
 private theorem p_zero : (p 0 : ℝ) = 2⁻¹ := by
@@ -603,7 +603,7 @@ theorem zero_not_mem_segment_iff {V}
       . rw [← neg_le_iff_add_nonneg', ← neg_one_mul, ← le_div_iff₀ ha,
           div_div, mul_comm]
         exact this.le
-      . rw [← neg_lt_iff_pos_add, ← neg_one_mul, ← lt_div_iff hb,
+      . rw [← neg_lt_iff_pos_add, ← neg_one_mul, ← lt_div_iff₀ hb,
           div_div, real_inner_comm]
         exact this
     suffices ⟪a, b⟫ / (‖a‖ * ‖b‖) ≠ -1 from this.lt_of_le' <|
@@ -637,15 +637,15 @@ def aux.e : (ℝ × ℝ) ≃L[ℝ] EuclideanSpace ℝ (Fin 2) :=
 -- TODO move this
 @[simp] theorem EuclideanSpace.real_inner_two_apply (x y : EuclideanSpace ℝ (Fin 2)) :
     ⟪x, y⟫ = x 0 * y 0 + x 1 * y 1 := by
-  simp
+  simp; ring
 
 @[simp] theorem EuclideanSpace.real_inner_two_apply_mk (a b c d : ℝ) :
     @inner ℝ (EuclideanSpace ℝ (Fin 2)) _ ![a, b] ![c, d] = a * c + b * d := by
-  simp
+  simp; ring
 
 @[simp] theorem vec_two_ext {α} {a b c d : α} :
     ![a, b] = ![c, d] ↔ a = c ∧ b = d := by
-  simp [Matrix.vecCons, Fin.cons_eq_cons]
+  simp [Matrix.vecCons]
 
 
 -- @[simp] theorem EuclideanSpace.two_mk_sub_mk {𝕜} [IsROrC 𝕜] (a b c d : 𝕜) :
@@ -673,7 +673,6 @@ theorem aux.homotopy_l_injective_zero : ∀ t, Function.Injective (aux.homotopy_
   constructor
   case left =>
     split_ifs <;> simp only [t0, t1, t2, t3] at * <;> try (exfalso; linarith)
-    save
     all_goals
     . simp only [squareCoe, q0_x, q0_y, q1_x, q1_y, q2_x, q2_y, q3_x, q3_y,
         p_zero, map_sub, e_apply_mk, sub_ne_zero]
@@ -688,15 +687,14 @@ theorem aux.homotopy_l_injective_zero : ∀ t, Function.Injective (aux.homotopy_
     all_goals
     . simp_rw [map_sub, squareCoe_mk, e_apply_mk, inner_sub_left,
         EuclideanSpace.real_inner_two_apply_mk, p_zero]
-      norm_num1 <;> linarith
+      norm_num1; linarith
   all_goals
   . split_ifs <;> simp only [t0, t1, t2, t3] at * <;> try (exfalso; linarith)
-    save
     all_goals
     . simp only [squareCoe, q0_x, q0_y, q1_x, q1_y, q2_x, q2_y, q3_x, q3_y,
         p_zero, map_sub, e_apply_mk, inner_sub_left,
         EuclideanSpace.real_inner_two_apply_mk]
-      norm_num1 <;> linarith
+      norm_num1; linarith
 
 set_option maxHeartbeats 1000000 in
 theorem aux.homotopy_i_injective_zero : ∀ t, Function.Injective (aux.homotopy_i 0 |>.curry t) := by
@@ -710,7 +708,6 @@ theorem aux.homotopy_i_injective_zero : ∀ t, Function.Injective (aux.homotopy_
   constructor
   case left =>
     split_ifs <;> simp only [t0, t1, t2, t3] at * <;> try (exfalso; linarith)
-    save
     all_goals
     . simp only [squareCoe, q0_x, q0_y, q1_x, q1_y, q2_x, q2_y, q3_x, q3_y,
         p_zero, map_sub, e_apply_mk, sub_ne_zero]
@@ -723,12 +720,11 @@ theorem aux.homotopy_i_injective_zero : ∀ t, Function.Injective (aux.homotopy_
     simp_rw [map_sub, squareCoe_mk, e_apply_mk, inner_sub_left, EuclideanSpace.real_inner_two_apply_mk]
     simpa using hxy
   split_ifs <;> simp only [t0, t1, t2, t3] at * <;> try (exfalso; linarith)
-  save
   all_goals
   . simp only [squareCoe, q0_x, q0_y, q1_x, q1_y, q2_x, q2_y, q3_x, q3_y,
       p_zero, map_sub, e_apply_mk, inner_sub_left,
       EuclideanSpace.real_inner_two_apply_mk]
-    norm_num1 <;> linarith
+    norm_num1; linarith
 
 
 theorem aux.homotopy_l_succ_eq n s t :
@@ -1036,7 +1032,7 @@ lemma aux.dist_le_l_succ n :
   all_goals
   . simp only [q_dist_map]
     rw [le_max_iff]
-    simp_rw [div_le_div_right (c := (2 : ℝ)) (by positivity)]
+    simp_rw [div_le_div_iff_of_pos_right (c := (2 : ℝ)) (by positivity)]
     first
     | left
       apply le_ciSup (f := fun x => dist _ _)
@@ -1058,7 +1054,7 @@ lemma aux.dist_le_i_succ n :
   split_ifs
   all_goals
   . simp only [q_dist_map]
-    simp_rw [div_le_div_right (c := (2 : ℝ)) (by positivity)]
+    simp_rw [div_le_div_iff_of_pos_right (c := (2 : ℝ)) (by positivity)]
     apply le_ciSup (f := fun x => dist _ _)
     rw [bddAbove_def]
     use 1
@@ -1116,7 +1112,7 @@ lemma aux.dist_le_homotopy_l_succ n :
   split_ifs <;>
     simp only [q_dist_map] <;>
     rw [le_max_iff] <;>
-    simp_rw [div_le_div_right (c := (2 : ℝ)) (by positivity)] <;>
+    simp_rw [div_le_div_iff_of_pos_right (c := (2 : ℝ)) (by positivity)] <;>
     [ (right; apply le_ciSup (f := fun x => dist _ _));
       (left; apply le_ciSup (f := fun x => dist _ _));
       (left; apply le_ciSup (f := fun x => dist _ _));
@@ -1137,7 +1133,7 @@ lemma aux.dist_le_homotopy_i_succ n :
   conv_lhs => rw [homotopy_i_succ_eq, homotopy_i_succ_eq]
   split_ifs <;>
     simp only [q_dist_map] <;>
-    simp_rw [div_le_div_right (c := (2 : ℝ)) (by positivity)] <;>
+    simp_rw [div_le_div_iff_of_pos_right (c := (2 : ℝ)) (by positivity)] <;>
     apply le_ciSup (f := fun x => dist _ _)
   all_goals
   . rw [bddAbove_def]
@@ -1240,7 +1236,7 @@ theorem aux.hilbertCurve'_spec : Tendsto (fun n => (aux n).2) atTop (nhds hilber
 
 theorem aux.hilbertCurve'_eq_iff x y :
     hilbertCurve' x = y ↔ Tendsto (fun n => (aux n).2 x) atTop (nhds y) := by
-  have := ContinuousMap.continuous_eval_const x |>.tendsto hilbertCurve' |>.comp hilbertCurve'_spec
+  have := ContinuousEvalConst.continuous_eval_const x |>.tendsto hilbertCurve' |>.comp hilbertCurve'_spec
   exact ⟨fun h => h ▸ this, tendsto_nhds_unique this⟩
 
 -- TODO: wiggle this around
@@ -1350,7 +1346,7 @@ theorem aux.partialHomotopy_apply_lt n m (hm : m < n) {t x : I}
     . rw [Set.mem_Icc]
       rw [pow_succ] at t_hi
       set v : ℝ := 2 ^ (m + 1)
-      have : 2 ≤ v := le_self_pow one_le_two m.succ_ne_zero
+      have : 2 ≤ v := le_self_pow₀ one_le_two m.succ_ne_zero
       constructor <;> [ nlinarith only [t_lo, this]; nlinarith only [t_hi, this] ]
     . convert t_lo using 1
       ring1
@@ -1381,12 +1377,12 @@ end Aux
 noncomputable def hilbertCurve : Path (X := I × I) (0, 0) (1, 0) where
   toFun := aux.hilbertCurve'
   source' := by
-    apply tendsto_nhds_unique <| ContinuousMap.continuous_eval_const 0 |>.tendsto aux.hilbertCurve'
+    apply tendsto_nhds_unique <| ContinuousEvalConst.continuous_eval_const 0 |>.tendsto aux.hilbertCurve'
       |>.comp aux.hilbertCurve'_spec
     simp only [Function.comp_def, ContinuousMap.coe_coe, Path.source, Prod.tendsto_iff]
     exact ⟨tendsto_const_nhds, p_tendsto_zero⟩
   target' := by
-    apply tendsto_nhds_unique <| ContinuousMap.continuous_eval_const 1 |>.tendsto aux.hilbertCurve'
+    apply tendsto_nhds_unique <| ContinuousEvalConst.continuous_eval_const 1 |>.tendsto aux.hilbertCurve'
       |>.comp aux.hilbertCurve'_spec
     simp only [Function.comp_def, ContinuousMap.coe_coe, Path.target, Prod.tendsto_iff]
     exact ⟨tendsto_const_nhds, p_tendsto_zero⟩
@@ -1408,7 +1404,7 @@ theorem hilbertCurve_surjective : Function.Surjective hilbertCurve := by
     replace hϕ := hϕ.tendsto_atTop
     exists a
     apply Eq.symm ∘ tendsto_nhds_unique (hf.comp hϕ)
-    exact ContinuousMap.continuous_eval.tendsto _ |>.comp <|
+    exact ContinuousEval.continuous_eval.tendsto _ |>.comp <|
       show Tendsto (fun n => (_, (f ∘ ϕ) n)) atTop (nhds (_, a)) from
         Prod.tendsto_iff _ _ |>.mpr ⟨hilbertCurve_spec.comp hϕ, ha⟩
   have h n : ∃ x, dist y ((aux n).2 x) ≤ 1 / 2 ^ n
@@ -1435,20 +1431,20 @@ theorem hilbertCurve_surjective : Function.Surjective hilbertCurve := by
 noncomputable def hilbertHomotopy' : ContinuousMap.Homotopy (X := I) (Y := I × I) (aux 0).2 hilbertCurve where
   toFun := aux.homotopy'
   map_zero_left x := by
-    apply tendsto_nhds_unique <| ContinuousMap.continuous_eval_const (0, x) |>.tendsto _
+    apply tendsto_nhds_unique <| ContinuousEvalConst.continuous_eval_const (0, x) |>.tendsto _
       |>.comp aux.homotopy'_spec
     simp [Function.comp_def]
   map_one_left x := by
-    apply tendsto_nhds_unique <| ContinuousMap.continuous_eval_const (1, x) |>.tendsto _
+    apply tendsto_nhds_unique <| ContinuousEvalConst.continuous_eval_const (1, x) |>.tendsto _
       |>.comp aux.homotopy'_spec
-    simpa [Function.comp_def] using ContinuousMap.continuous_eval_const x |>.tendsto _
+    simpa [Function.comp_def] using ContinuousEvalConst.continuous_eval_const x |>.tendsto _
       |>.comp hilbertCurve_spec
 
 theorem hilbertHomotopy'_injective {t} (ht : t < 1) : Function.Injective (hilbertHomotopy'.curry t) := by
   let m := Nat.log2 ⌊1 / (1 - t : ℝ)⌋₊
   replace ht : 0 < (1 - t : ℝ) := by linarith only [show (t : ℝ) < 1 from ht]
   convert aux.homotopy_i_injective m _ using 2
-  apply tendsto_nhds_unique <| ContinuousMap.continuous_eval_const t |>.comp ContinuousMap.continuous_curry |>.tendsto _
+  apply tendsto_nhds_unique <| ContinuousEvalConst.continuous_eval_const t |>.comp ContinuousMap.continuous_curry |>.tendsto _
     |>.comp aux.homotopy'_spec
   simp only [Function.comp_def]
   apply tendsto_atTop_of_eventually_const (i₀ := m + 1)

@@ -75,7 +75,7 @@ def hilbert : @IsWalkable (I × I) (fun x => ![x.1, x.2]) (fun x => ![invHilbert
         (fun t => aux.e ∘ squareCoe <| hilbertHomotopy' (t, invHilbertCurve x))
         (aux.e.continuous.comp <| squareCoe.continuous.comp <| .comp
           (map_continuous _)
-          (.prod_mk continuous_id continuous_const)))
+          (.prodMk continuous_id continuous_const)))
       (by simp)
       (by simp [squareCoe]; rw [hilbertCurve_invHilbertCurve])
     intro t
@@ -94,20 +94,19 @@ def hilbert : @IsWalkable (I × I) (fun x => ![x.1, x.2]) (fun x => ![invHilbert
     apply hilbertHomotopy'_injective
     rcases t with ⟨t, ht₀, ht₁⟩
     simpa [unitInterval.symm, ← Subtype.coe_lt_coe] using ht
-  save
   . exists fun x => .mk
       (.mk
         (fun t => ![invHilbertCurve x, σ t / 2])
         (by
           simp_rw [← aux.e_apply_mk]
-          exact aux.e.continuous.comp <| .prod_mk
+          exact aux.e.continuous.comp <| .prodMk
             continuous_const
             (by continuity)))
       (by simp)
       (by simp)
     intro t
     refine Function.Injective.of_comp (f := fun x => x 0) ?_
-    simpa [Function.comp] using Subtype.coe_injective.comp invHilbertCurve_injective
+    simpa [Function.comp_def] using Subtype.coe_injective.comp invHilbertCurve_injective
 
 end IsWalkable
 
@@ -131,7 +130,7 @@ lemma walkies.aux {α} (s : α ↪ EuclideanSpace ℝ (Fin 2)) :
           (fun t => (1 + t * ‖s i‖)⁻¹ • s i)
           (.smul (.inv₀ (by clear * -; continuity) (fun t => (hc t).ne')) continuous_const))
         (by simp)
-        (by simp)
+        (by simp [e])
       intro t i j h
       simp only [Path.coe_mk_mk] at h
       have h_norm : ‖s i‖ = ‖s j‖
@@ -144,7 +143,7 @@ lemma walkies.aux {α} (s : α ↪ EuclideanSpace ℝ (Fin 2)) :
     have e_inj : Injective e := h₁.end_injective
     have e_norm i : ‖e i‖ < 1
     . have hc : 0 < 1 + ‖s i‖ := by positivity
-      simp_rw [e, norm_smul, norm_inv, Real.norm_of_nonneg hc.le, inv_mul_lt_iff hc]
+      simp_rw [e, norm_smul, norm_inv, Real.norm_of_nonneg hc.le, inv_mul_lt_iff₀ hc]
       simp
     let e' i : EuclideanSpace ℝ (Fin 2) := midpoint ℝ (e i) ![1, 1]
     have h₂ : IsWalkable e e'
@@ -163,7 +162,6 @@ lemma walkies.aux {α} (s : α ↪ EuclideanSpace ℝ (Fin 2)) :
       erw [← AffineMap.coe_comp, ← AffineMap.homothety_mul, one_div_mul_cancel (by linarith only [t.2.2]),
         AffineMap.homothety_one, AffineMap.coe_id]
       exact fun {_ _} => id
-    save
     have e'_inj : Injective e' := h₂.end_injective
     obtain ⟨te, h₃⟩ := this ⟨e', e'_inj⟩ <| by
       clear * - e_inj e_norm
@@ -180,7 +178,6 @@ lemma walkies.aux {α} (s : α ↪ EuclideanSpace ℝ (Fin 2)) :
       have := Finset.single_le_sum (fun _ _ => sq_nonneg _) (Finset.mem_univ k) |>.trans e_norm
       simpa only [Real.norm_eq_abs, sq_abs, sq_le_one_iff_abs_le_one, abs_le]
     exact ⟨te, .trans h₁ (.trans h₂ h₃)⟩
-  save
   let s' i : I × I :=
     (⟨s i 0, (hs i).1⟩, ⟨s i 1, (hs i).2⟩)
   have s'_inj : Injective s'
@@ -212,8 +209,7 @@ theorem walkies {α} (s e : α ↪ EuclideanSpace ℝ (Fin 2)) :
       (by norm_num)
     intro t
     refine of_comp (f := fun x => x 0) ?_
-    simpa using Subtype.coe_injective.comp s'.injective
-  save
+    simpa [Function.comp_def] using Subtype.coe_injective.comp s'.injective
   . exists fun i => .mk
       (.mk
         (fun t => ![(1 - t) * s' i, e' i])
@@ -224,8 +220,7 @@ theorem walkies {α} (s e : α ↪ EuclideanSpace ℝ (Fin 2)) :
       (by norm_num)
     intro t
     refine of_comp (f := fun x => x 1) ?_
-    simpa using Subtype.coe_injective.comp e'.injective
-  save
+    simpa [Function.comp_def] using Subtype.coe_injective.comp e'.injective
   . exists fun i => .mk
       (.mk
         (fun t => ![t * e' i, (1 - t) * e' i])

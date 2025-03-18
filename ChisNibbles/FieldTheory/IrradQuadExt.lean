@@ -263,6 +263,7 @@ lemma F₀.no_roots.aux {F : Type*} [Field F] (p : F[X]) :
   . omega
   . rw [natDegree_add_eq_left_of_natDegree_lt] <;> omega
 
+open scoped Polynomial.Bivariate in
 open RatFunc hiding X C in
 lemma F₀.no_roots : ∀ x : F₀, not_a_root x := by
   let F := AlgebraicClosure (ZMod 2)
@@ -384,6 +385,7 @@ lemma F.odd_prime_radically_closed.aux
   apply IntermediateField.subset_adjoin
   exists p
 
+open IntermediateField in
 lemma F.odd_prime_radically_closed
   {E : Type*} [Field E] [Algebra F E]
   {p : ℕ} (p_odd : Odd p) (hp : p.Prime)
@@ -394,7 +396,8 @@ lemma F.odd_prime_radically_closed
   have x_int : IsIntegral F x := xp_int.of_pow hp.pos
 
   -- transport to F⟮x⟯
-  letI : Algebra F F⟮x⟯ := Subalgebra.algebra _
+  let _ : Algebra F F⟮x⟯ := F⟮x⟯.algebra
+  let _ : Module F F⟮x⟯ := Algebra.toModule
   rw [← coe_gen F x] at hy ⊢
   set x' : F⟮x⟯ := gen F x
   change ((y : F⟮x⟯) : E) = x' ^ p at hy
@@ -405,13 +408,13 @@ lemma F.odd_prime_radically_closed
     exists y
 
   -- transport to AlgebraicClosure F₀
-  letI : Algebra F₀ F⟮x⟯ := (algebraMap F F⟮x⟯).comp (algebraMap F₀ F) |>.toAlgebra
-  haveI := IsScalarTower.of_algebraMap_eq (R := F₀) (S := F) (A := F⟮x⟯) fun _ => rfl
+  let _ : Algebra F₀ F⟮x⟯ := (algebraMap F F⟮x⟯).comp (algebraMap F₀ F) |>.toAlgebra
+  have := IsScalarTower.of_algebraMap_eq (R := F₀) (S := F) (A := F⟮x⟯) fun _ => rfl
   -- bleh why is there no applicable lemma for this
-  haveI : Algebra.IsAlgebraic F₀ F := Algebra.isAlgebraic_def.mpr fun x => by
+  have : Algebra.IsAlgebraic F₀ F := Algebra.isAlgebraic_def.mpr fun x => by
     rw [IntermediateField.isAlgebraic_iff]
-    apply IsAlgClosure.algebraic.isAlgebraic
-  haveI : Algebra.IsAlgebraic F F⟮x⟯ := isAlgebraic_adjoin fun x => by
+    apply IsAlgebraic.isAlgebraic
+  have : Algebra.IsAlgebraic F F⟮x⟯ := isAlgebraic_adjoin fun x => by
     rw [Set.mem_singleton_iff]
     exact fun hx => hx ▸ x_int
   have f := IsAlgClosed.lift (R := F) (S := F⟮x⟯) (M := AlgebraicClosure F₀)

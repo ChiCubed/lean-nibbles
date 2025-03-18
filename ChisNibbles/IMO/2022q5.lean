@@ -46,7 +46,7 @@ lemma weak_fac_bound (n : ℕ) : n ! ≤ n ^ n := by
   cases' n with n
   case zero => norm_num
   apply fac_bound (n+1) |>.trans
-  gcongr; omega
+  gcongr <;> omega
 
 lemma pow_add_lt_aux (a : ℕ) : ∀ n : ℕ,
     (a+1) ^ (n+2) + (n+2) < (a+2) ^ (n+2)
@@ -63,7 +63,7 @@ lemma pow_add_lt_aux (a : ℕ) : ∀ n : ℕ,
 -- if < were ≤ we could remove n_large
 lemma pow_add_lt {a b n : ℕ} (a_pos : 0 < a) (n_large : 2 ≤ n) (a_lt_b : a < b) :
     a^n + n < b^n := by
-  suffices a^n + n < (a+1)^n from this.trans_le $ by gcongr; omega
+  suffices a^n + n < (a+1)^n from this.trans_le $ by gcongr <;> omega
   obtain ⟨a, rfl⟩ := Nat.exists_eq_add_of_lt a_pos
   obtain ⟨n, rfl⟩ := Nat.exists_eq_add_of_le n_large
   convert pow_add_lt_aux a n using 2 <;> ring
@@ -146,7 +146,7 @@ theorem q5 (a b p : ℕ) :
     exact pow_dvd_pow _ hp.two_le
 
   have m_small : m < p := by
-    refine lt_of_mul_lt_mul_left' $ lt_of_pow_lt_pow_left p (p * p).zero_le ?_
+    refine lt_of_mul_lt_mul_left' $ lt_of_pow_lt_pow_left₀ p (p * p).zero_le ?_
     rw [← pow_two, ← pow_mul, h]
     calc
       b ! + p ≤ (2*p - 1)! + p    := by gcongr; omega
@@ -156,7 +156,7 @@ theorem q5 (a b p : ℕ) :
       _       ≤ p ^ (2*p)         := by rw [← pow_succ]; gcongr <;> omega
     rw [mul_two]
     gcongr
-    apply lt_self_pow <;> have := hp.one_lt <;> omega
+    apply lt_self_pow₀ <;> have := hp.one_lt <;> omega
 
   obtain rfl : m = 1 := by
     suffices m ≤ 1 by omega
@@ -224,21 +224,21 @@ theorem q5 (a b p : ℕ) :
 
   replace h : (p ^ p - p : ℤ) = b ! := by rw [sub_eq_iff_eq_add]; exact_mod_cast h
 
-  have : (p ^ p - p : ℤ) = (p + 1) * (p * o * ∑ i in range k, (p ^ 2) ^ i) := by
+  have : (p ^ p - p : ℤ) = (p + 1) * (p * o * ∑ i ∈ range k, (p ^ 2) ^ i) := by
     rw [pow_succ, pow_mul]
     convert congrArg ((p : ℤ) * ·) (mul_geom_sum (p ^ 2 : ℤ) k).symm using 1
     . ring
-    . clear_value o; push_cast; ring
+    . clear_value o; unfold p; push_cast; ring
   rw [this] at h; clear this
   norm_cast at h
 
-  have con : ¬ p + 1 ∣ p * o * ∑ i in range k, (p ^ 2) ^ i := by
+  have con : ¬ p + 1 ∣ p * o * ∑ i ∈ range k, (p ^ 2) ^ i := by
     rw [← ZMod.natCast_zmod_eq_zero_iff_dvd]
     have : (o : ZMod (p + 1)) = -2 := by
       rw [← sub_eq_zero, sub_neg_eq_add]
       norm_cast
       rw [ZMod.natCast_zmod_eq_zero_iff_dvd]
-    push_cast; rw [this]; norm_num1
+    unfold p; push_cast; rw [this]; norm_num1
     simp only [one_pow, sum_const, card_range, smul_one_eq_cast]
     norm_cast
     rw [this, neg_eq_zero, ← ZMod.val_eq_zero]

@@ -1,5 +1,11 @@
 import Mathlib
 
+
+/-
+For n > m > 1 odd, x^n + x^m + x + 1 is irreducible.
+-/
+
+
 open Polynomial
 
 
@@ -612,7 +618,7 @@ namespace main₁
           List.Pairwise.nodup <| List.chain'_iff_pairwise.mp <|
             show List.Chain' (· < ·) _ by simp [a_lo, a_hi]
         have finset : [0, 1, a, d.n].toFinset = ix := by
-          simp
+          simp [ix]
         convert_to s.q = ([0, 1, a, d.n].map (X ^ ·)).sum
         . simp; ring
         rw [← List.sum_toFinset _ nodup, finset, sum_X_pow_finset_eq_ofFinsupp_indicator]

@@ -1,15 +1,21 @@
 import Mathlib.Algebra.Group.Basic
+import Mathlib.Algebra.Group.Commutator
 import Mathlib.Algebra.Category.Grp.Basic
 import Mathlib.Algebra.Category.ModuleCat.Basic
+import Mathlib.Algebra.EuclideanDomain.Int
 import Mathlib.Algebra.Module.ZMod
+import Mathlib.Algebra.Field.ZMod
 import Mathlib.GroupTheory.SpecificGroups.Quaternion
 import Mathlib.GroupTheory.OrderOfElement
 import Mathlib.GroupTheory.NoncommPiCoprod
 import Mathlib.GroupTheory.Torsion
-import Mathlib.Algebra.Group.Commutator
 import Mathlib.LinearAlgebra.Basis.VectorSpace
-import Mathlib.RingTheory.Multiplicity
+import Mathlib.RingTheory.Coprime.Lemmas
+import Mathlib.RingTheory.PrincipalIdealDomain
+import Mathlib.RingTheory.UniqueFactorizationDomain.Multiplicity
+import Mathlib.RingTheory.UniqueFactorizationDomain.Nat
 import Mathlib.Data.Nat.Choose.Basic
+import Mathlib.Data.Nat.Prime.Int
 
 /-!
 # Hamiltonian groups
@@ -49,7 +55,7 @@ namespace Subgroup
 
   noncomputable def equiv_map_subtype {G : Type*} [Group G] {S : Subgroup G} {K : Subgroup S} :
       map S.subtype K ≃* K :=
-    .symm $ equivMapOfInjective _ _ $ S.coeSubtype ▸ Subtype.coe_injective
+    .symm $ equivMapOfInjective _ _ $ S.coe_subtype ▸ Subtype.coe_injective
 end Subgroup
 
 section orderOf
@@ -214,7 +220,7 @@ lemma quaternionHom_xa (a : ZMod 4) :
 lemma quaternionHom_injective : Function.Injective (quaternionHom oi hi hj) :=
   injective_iff_map_eq_one _ |>.mpr $ by
     rintro (a | a)
-    . revert a; simp [quaternionHom_a]; decide
+    . revert a; simp [quaternionHom_a]
     . cases' a using ZMod.forall.mpr with a
       intro h
       rw [quaternionHom_xa, exp_i_apply_coe, mul_eq_one_iff_eq_inv, ← zpow_neg] at h
@@ -345,8 +351,8 @@ lemma lift_to_prime_order (x y : G) {p : ℕ} (hp : p.Prime) (ho : orderOf ⁅x,
     ∃ x' : G,
       orderOf ⁅x', y⁆ = p ∧ IsOfFinOrder x' ∧
       ∃ n : ℕ, orderOf x' = p ^ (n + 1) := by
-  have ⟨b, ox', b_ndvd⟩ := multiplicity.exists_eq_pow_mul_and_not_dvd $
-    multiplicity.finite_nat_iff.mpr ⟨hp.ne_one, ox.orderOf_pos⟩
+  have ⟨b, ox', b_ndvd⟩ := FiniteMultiplicity.exists_eq_pow_mul_and_not_dvd $
+    .of_not_isUnit hp.not_unit ox.orderOf_pos.ne'
   have b_nz : b ≠ 0 := fun h => h ▸ b_ndvd $ dvd_zero _
 
   let x' := x ^ b
@@ -561,7 +567,7 @@ protected instance subgroup_modular_lattice :
     IsModularLattice (Subgroup G) where
   sup_inf_le_assoc_of_le {x} y z h := le_of_eq ∘ symm $ by
     rw [← SetLike.coe_set_eq]
-    show _ = ↑(x ⊔ y) ⊓ ↑z
+    change (_ : Set G) = ↑(x ⊔ y) ⊓ ↑z
     simp_rw [Subgroup.normal_mul]
     apply Subgroup.mul_inf_assoc (h := h)
 
@@ -583,7 +589,7 @@ lemma comm_cases_of_order_dvd_four (x y : G) (ho : x ^ 4 = 1) :
   by_cases hx : x = 1
   . exact .inl $ hx ▸ commutatorElement_one_left y
   have n_nz : n ≠ 0 := fun h =>
-    hx $ by rwa [h, zpow_zero, mul_inv_eq_one, mul_right_eq_self, inv_eq_one] at hn
+    hx $ by rwa [h, zpow_zero, mul_inv_eq_one, mul_eq_left, inv_eq_one] at hn
 
   have h := congrArg orderOf hn
   have o_conj : orderOf x⁻¹ = orderOf (y * x⁻¹ * y⁻¹) :=
@@ -601,7 +607,7 @@ lemma comm_cases_of_order_dvd_four (x y : G) (ho : x ^ 4 = 1) :
   rw [orderOf_inv, ho'] at h
 
   replace h := h.resolve_left $ pow_ne_zero k $ by norm_num
-  rw [Int.gcd_eq_one_iff_coprime, Nat.cast_pow, IsCoprime.pow_left_iff hk.1] at h
+  rw [← Int.isCoprime_iff_gcd_eq_one, Nat.cast_pow, IsCoprime.pow_left_iff hk.1] at h
   rw_mod_cast [Int.prime_two.coprime_iff_not_dvd] at h
 
   rw [← mul_right_inj x] at hn
@@ -690,7 +696,7 @@ lemma not_order_four_in_centralizer (g : C) :
   suffices (g : G) ^ 2 = 1 from
     pow_ne_one_of_lt_orderOf two_ne_zero (by rw_mod_cast [ho]; norm_num) this
   rw [cj.mul_pow] at h
-  convert mul_right_eq_self.mp $ h.symm.trans _
+  convert mul_eq_left.mp $ h.symm.trans _
   transport_group ϕ.symm
 
 
@@ -701,7 +707,7 @@ instance quaternion_centralizer.commutative :
     haveI hC : IsHamiltonian C :=
       { subgroups_normal := fun S => by
           convert hG.subgroups_normal (S.map (C).subtype) |>.comap (C).subtype
-          simp only [comap_map_eq_self_of_injective, Subgroup.coeSubtype, Subtype.coe_injective]
+          simp only [comap_map_eq_self_of_injective, Subgroup.coe_subtype, Subtype.coe_injective]
         anabelian := fun hc => h $ hc a b }
 
     obtain ⟨S, ⟨ψ⟩⟩ := hC.embeds_quaternions
@@ -808,20 +814,20 @@ lemma quaternion_centralizer.decomp :
     let n := orderOf x
     have hn : 0 < n := is_torsion ϕ x |>.orderOf_pos
 
-    let o := ord_compl[2] n
-    let e := ord_proj[2] n
+    let o := ordCompl[2] n
+    let e := ordProj[2] n
 
-    have o_pos : 0 < o := ord_compl_pos _ hn.ne'
-    have e_pos : 0 < e := ord_proj_pos ..
+    have o_pos : 0 < o := ordCompl_pos _ hn.ne'
+    have e_pos : 0 < e := ordProj_pos ..
 
-    have two_ndvd : ¬ 2 ∣ o := not_dvd_ord_compl prime_two hn.ne'
+    have two_ndvd : ¬ 2 ∣ o := not_dvd_ordCompl prime_two hn.ne'
 
     have he : orderOf (x ^ o) = e := by
-      rw [orderOf_pow' x o_pos.ne', gcd_eq_right (n.ord_compl_dvd _)]
+      rw [orderOf_pow' x o_pos.ne', gcd_eq_right (n.ordCompl_dvd _)]
       exact Nat.div_eq_of_eq_mul_left o_pos $ symm $
-        n.ord_proj_mul_ord_compl_eq_self _
+        n.ordProj_mul_ordCompl_eq_self _
     have ho : orderOf (x ^ e) = o := by
-      rw [orderOf_pow' x e_pos.ne', Nat.gcd_eq_right (n.ord_proj_dvd _)]
+      rw [orderOf_pow' x e_pos.ne', Nat.gcd_eq_right (n.ordProj_dvd _)]
 
     have hfe : IsOfFinOrder (x ^ o) := orderOf_pos_iff.mp (he ▸ e_pos)
     have hfo : IsOfFinOrder (x ^ e) := orderOf_pos_iff.mp (ho ▸ o_pos)
@@ -912,7 +918,7 @@ def two_primary_submodule_equiv :
 local notation "Ee" => two_primary_submodule_equiv ϕ
 
 lemma exists_isCompl : ∃ s, IsCompl (zpowers lo_n1) (Ee s) :=
-  have ⟨a, ha⟩ := Submodule.exists_isCompl $ (Ee).symm $ zpowers lo_n1
+  have ⟨a, ha⟩ := Submodule.exists_isCompl (K := ZMod 2) $ (Ee).symm $ zpowers lo_n1
   ⟨a, by convert ha.map Ee⟩
 
 section structure_theorem_aux
@@ -1004,8 +1010,8 @@ local notation "f" => ff ϕ E'
 
 -- cool proof using distrib lattice hax
 lemma f_inj : Function.Injective f :=
-  injective_noncommPiCoprod_of_independent $ by
-    rw [CompleteLattice.independent_def']
+  injective_noncommPiCoprod_of_iSupIndep $ by
+    rw [iSupIndep_def']
     intro i
     rw [show {j | j ≠ i} = {i + 1, i + 2} by ext x; revert i x; decide,
       Set.image_pair, sSup_pair]
@@ -1019,7 +1025,7 @@ lemma f_inj : Function.Injective f :=
     fin_cases i; exacts [h₀, h₁, h₂]
 
 lemma f_surj : Function.Surjective f :=
-  MonoidHom.range_top_iff_surjective.mp $
+  MonoidHom.range_eq_top.mp $
     noncommPiCoprod_range.trans $ cover_compl ϕ E' hE' |>.sup_eq_top.congr_right.mp $ by
       rw [← Finset.sup_univ_eq_iSup]
       show ({0, 1, 2} : Finset _).sup _ = _

@@ -13,7 +13,7 @@ but it seems to be lost to the winds of time.
 
 example (a b c : ℤ) (h : (2 : ℚ) ^ a = 2 ^ b + 2 ^ c) : b = c := by
   have two_nz : (2 : ℚ) ≠ 0 := by norm_num
-  have pow_two_mono : StrictMono (fun x : ℤ => (2 : ℚ) ^ x) := zpow_strictMono (by norm_num)
+  have pow_two_mono : StrictMono (fun x : ℤ => (2 : ℚ) ^ x) := zpow_right_strictMono₀ (by norm_num)
   wlog ha : a = 0 generalizing a b c h
   . replace h : (2 : ℚ) ^ (a - a) = 2 ^ (b - a) + 2 ^ (c - a)
     . simp_rw [zpow_sub₀ two_nz, ← add_div, ← h]
@@ -42,7 +42,7 @@ theorem padicValRat.zpow
   | nat k =>
     rw [zpow_natCast]
     apply padicValRat.pow hq
-  | neg k ih =>
+  | neg ih k =>
     simp_rw [zpow_neg, neg_mul, ← ih, zpow_natCast]
     apply padicValRat.inv
 
@@ -64,6 +64,6 @@ example (a b c : ℤ) : (2 : ℚ) ^ a + 2 ^ b = 2 ^ c → a = b := by
     . convert h <;> apply padicValRat.self_zpow
   erw [h₁, padicValRat.self_zpow] at this
   replace h₁ : (2 : ℚ) ^ a < 2 ^ c
-  . simp [← h₁, zpow_pos_of_pos]
-  rw [zpow_lt_iff_lt (by trivial)] at h₁
+  . simp [← h₁, zpow_pos]
+  rw [zpow_lt_zpow_iff_right₀ (by trivial)] at h₁
   aesop

@@ -51,8 +51,7 @@ lemma idea (x : ℕ)
     (by exact_mod_cast hc.symm) ?_ (by decide) ⟨k / n, by simp⟩
   rintro ⟨y, hy⟩
   apply hs
-  apply isSquare_of_exists_sq
-  use y.natAbs
+  convert IsSquare.sq y.natAbs
   zify
   rw [sq_abs]
   exact_mod_cast hy ▸ hc
@@ -80,7 +79,7 @@ lemma oks.spec (n : ℕ) (hs : ¬ IsSquare n)
   oks.gen n hs m hm 0 (by zify at hn; simpa) (by simpa using h)
 
 set_option maxRecDepth 2000 in
-set_option profiler true in
+-- set_option profiler true in
 lemma oks.lemma144 (u v : ZMod 144) :
     (v ^ 2 * -1 - u ^ 2).val ∉ Set.Icc 1 5 := by
   -- this proof also works but it's much slower:

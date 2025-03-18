@@ -40,6 +40,8 @@ lemma rec_matrix {a u : ℕ → ℤ}
     rw [List.prod_range_succ, ← Matrix.mul_assoc, ← ih,
       ← rec_matrix_step (us n), add_tsub_cancel_right]
 
+-- why's this thing getting in the way >:(
+seal CStarMatrix in
 lemma aux (n : ℕ) (a u v : ℕ → ℤ)
   (u0 : u 0 = 1) (v0 : v 0 = 1)
   (us : ∀ i, u (i + 1) = u i + a i * u (i - 1))
@@ -52,16 +54,16 @@ lemma aux (n : ℕ) (a u v : ℕ → ℤ)
   let B' : Matrix _ _ ℤ := !![0, 1; 1, -1]
   let B_inv : Invertible B := B.invertibleOfLeftInverse B' (by decide)
   calc
-    _ = _ᵀ                                                     :=
+    _ = _ᵀ                                                :=
       transpose_1x1 _ |>.symm
-    _ = !![(1 : ℤ), 0] * (prod _)ᵀ * !![(1 : ℤ); 1]            := by
+    _ = !![(1 : ℤ), 0] * _ᵀ * !![(1 : ℤ); 1]              := by
       simp_rw [transpose_mul, ← Matrix.mul_assoc]
       congr <;> exact transposeᵣ_eq _ |>.symm
-    _ = (!![(1 : ℤ), 1] * ⅟B) * _ * (B * !![(1 : ℤ); 0])       := by
+    _ = (!![(1 : ℤ), 1] * ⅟B) * _ * (B * !![(1 : ℤ); 0])  := by
       congr <;> decide
-    _ = !![(1 : ℤ), 1] * (⅟B * (prod _)ᵀ * B) * !![(1 : ℤ); 0] := by
+    _ = !![(1 : ℤ), 1] * (⅟B * _ᵀ * B) * !![(1 : ℤ); 0]   := by
       simp [Matrix.mul_assoc]; rfl
-    _ = _                                                      := ?_
+    _ = _                                                 := ?_
   congr
   rw [transpose_list_prod, invOf_eq_nonsing_inv, conjugate_list_prod]
   simp only [← map_reverse, List.map_map, range_eq_range', reverse_range']

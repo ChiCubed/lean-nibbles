@@ -17,21 +17,21 @@ theorem padicValNat.val_2_lt_add_of_eq
   have hab : 0 < a + b := by positivity
   rw [← PartENat.coe_lt_coe]
   apply congrArg (Nat.cast (R := PartENat)) at h
-  simp only [padicValNat_eq_maxPowDiv, maxPowDiv_eq_multiplicity,
-    one_lt_two, ha, hb, hab] at h ⊢
+  simp_all only [add_pos_iff, or_self, padicValNat_eq_maxPowDiv, Nat.one_lt_ofNat,
+    Nat.finiteMultiplicity_iff, ne_eq, OfNat.ofNat_ne_one, not_false_eq_true, and_self,
+    maxPowDiv_eq_multiplicity, Nat.cast_inj, Nat.cast_lt]
   set va := multiplicity 2 a
   set vb := multiplicity 2 b
-  have v_fin {x} (h : 0 < x) := multiplicity.finite_nat_iff.mpr ⟨one_lt_two.ne', h⟩
-  have this {x} (h : 0 < x) := multiplicity.exists_eq_pow_mul_and_not_dvd <| v_fin h
-  obtain ⟨a', ha₁ : a = 2 ^ (va.get _) * a', ha'⟩ := this ha
-  obtain ⟨b', hb₁ : b = 2 ^ (vb.get _) * b', hb'⟩ := this hb
+  have v_fin {x} (h : 0 < x) := @Nat.finiteMultiplicity_iff 2 x |>.mpr (by omega)
+  have this {x} (h : 0 < x) := (v_fin h).exists_eq_pow_mul_and_not_dvd
+  obtain ⟨a', ha₁ : a = 2 ^ va * a', ha'⟩ := this ha
+  obtain ⟨b', hb₁ : b = 2 ^ vb * b', hb'⟩ := this hb
   rw [ha₁, hb₁]
   simp_rw [h]
-  rw [← mul_add, multiplicity.mul Nat.prime_two.prime,
-    multiplicity.multiplicity_pow_self (by norm_num) (by simp)]
-  simp only [PartENat.natCast_get, gt_iff_lt]
-  rw [PartENat.lt_add_iff_pos_right (multiplicity.ne_top_iff_finite.mpr <| v_fin hb),
-    multiplicity.dvd_iff_multiplicity_pos]
+  rw [← mul_add, multiplicity_mul Nat.prime_two.prime (v_fin (by rw [mul_add]; omega)),
+    multiplicity_pow_self_of_prime Nat.prime_two.prime]
+  rw [lt_add_iff_pos_right]
+  apply multiplicity_pos_of_dvd
   omega
 
 example (m n : ℕ) (hm : 0 < m) (ho : m < n) :
