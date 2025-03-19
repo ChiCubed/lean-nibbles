@@ -42,7 +42,7 @@ lemma rec_matrix {a u : ℕ → ℤ}
 
 -- why's this thing getting in the way >:(
 seal CStarMatrix in
-lemma aux (n : ℕ) (a u v : ℕ → ℤ)
+theorem woo (n : ℕ) (a u v : ℕ → ℤ)
   (u0 : u 0 = 1) (v0 : v 0 = 1)
   (us : ∀ i, u (i + 1) = u i + a i * u (i - 1))
   (vs : ∀ i, v (i + 1) = v i + a (n - i) * v (i - 1)) :
