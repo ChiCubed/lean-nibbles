@@ -8,6 +8,7 @@ import ChisNibbles.Bits.HlawkaInequalityStep
 import ChisNibbles.Bits.IMOSL2021C1
 import ChisNibbles.Bits.KindaGCDPreserver
 import ChisNibbles.Bits.OppositeFLT
+import ChisNibbles.Bits.RollTheDice
 import ChisNibbles.Bits.SequenceReversalThing
 import ChisNibbles.Bits.SomePowerBound
 import ChisNibbles.Bits.UnidentifiedProblem
