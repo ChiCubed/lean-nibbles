@@ -63,7 +63,7 @@ theorem Std.Range.mem_iff_dvd (x : Nat) (r : Range) :
 attribute [local grind] Nat.minFac_prime Nat.prime_def_minFac Nat.minFac_dvd Nat.minFac_le in
 attribute [local grind →] Nat.Prime.two_le in
 open Std.Do in
-theorem primesLt.spec n :
+@[spec] theorem primesLt.spec n :
     ⦃⌜True⌝⦄ primesLt n ⦃⇓r => ⌜(∀ p, p ∈ r ↔ p < n ∧ p.Prime) ∧ r.toList.Sorted (· ≤ ·)⌝⦄ := by
   mvcgen [primesLt]
   case inv1 =>
@@ -82,10 +82,10 @@ theorem primesLt.spec n :
   all_goals simp_all
   case vc1.step => grind (splits := 20) [Nat.le_mul_self]
   case vc2.step.isTrue.pre => grind
-  case vc3.step.isTrue.post.success pp p _ _ _ _ _ _ _ _ _ _ =>
+  case vc3.step.isTrue.post.success p _ _ _ _ _ _ _ _ _ _ =>
     have : ∀ i, i ∈ [p*p:n:p] ↔ p * p ≤ i ∧ i < n ∧ p ∣ i := by
       simp +contextual [Std.instMembershipNatRange, ← Nat.dvd_iff_mod_eq_zero, Nat.dvd_sub_iff_left]
-    suffices ∀ i < n, 2 ≤ i → i.minFac ∉ pp → (i ∈ [p*p:n:p] ↔ i ≠ p ∧ i.minFac = p) by grind
+    suffices ∀ i < n, 2 ≤ i → p ≤ i.minFac → (i ∈ [p*p:n:p] ↔ i ≠ p ∧ i.minFac = p) by grind
     -- TODO `=_ Nat.lt_mul_self_iff` is doing something silly but hey if it works it works
     grind [Nat.minFac_sq_le_self, Nat.pow_two, → Nat.minFac_le_of_dvd, =_ Nat.lt_mul_self_iff]
   case vc4.step.isFalse => grind [=> List.mem_append_left]
