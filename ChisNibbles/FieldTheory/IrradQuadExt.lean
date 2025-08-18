@@ -45,14 +45,14 @@ section trace_pow_expChar
 
     obtain hι | hι := isEmpty_or_nonempty ι
     . obtain rfl := Subsingleton.allEq A 0
-      simp [zero_pow_eq, hn.ne', charpoly]
+      simp [hn.ne']
     haveI : ExpChar (Matrix ι ι R[X]) n := expChar_of_injective_ringHom
       (f := scalar ι) (fun _ _ => scalar_inj.mp) n
 
     rw [sub_pow_expChar_of_commute]
     apply scalar_commute _ fun _ => .all _ _
 
-  open Matrix in
+  open Matrix Module in
   theorem LinearMap.trace_pow_expChar
     {M : Type*} [AddCommGroup M] [Module R M]
     (l : M →ₗ[R] M) :
@@ -222,7 +222,7 @@ private lemma AlgClosed_has_nth_roots
   have : p.aroots E = _ := Polynomial.roots_map (algebraMap F E) $ IsAlgClosed.splits p
   rw [this, Multiset.mem_map] at ha
   rcases ha with ⟨b, _, rfl⟩
-  simp [IntermediateField.mem_bot]
+  simp
 
 private lemma F₀_has_nth_roots {E : Type*} [Field E] [Algebra F₀ E] {n : ℕ} (hn : 0 < n) :
     ∀ a : E, a ^ n = 1 → a ∈ (⊥ : IntermediateField F₀ E) := by
@@ -459,9 +459,9 @@ theorem E.no_new_radicals
   (x : E) (hx : x ^ n ∈ (algebraMap F E).range) :
     x ∈ (algebraMap F E).range := by
   induction n using induction_on_primes with
-  | h₀ => simp at hn
-  | h₁ => rwa [pow_one] at hx
-  | h p n hp ih =>
+  | zero => simp at hn
+  | one => rwa [pow_one] at hx
+  | prime_mul p n hp ih =>
     specialize ih (Nat.pos_of_mul_pos_left hn); clear hn
     apply ih; clear ih
     rw [pow_mul'] at hx

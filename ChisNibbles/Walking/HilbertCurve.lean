@@ -1,5 +1,7 @@
 import Mathlib
 
+-- TODO: improve some of the proofs here with new automation
+
 open unitInterval
 
 namespace unitInterval
@@ -54,11 +56,6 @@ def unprod {α β₁ β₂ : Type*} [TopologicalSpace α] [TopologicalSpace β�
     (f : C(α, β₁ × β₂)) : (fx : C(α, β₁)) × (fy : C(α, β₂)) ×' f = fx.prodMk fy :=
   ⟨fst.comp f, snd.comp f, by ext <;> simp⟩
 
-theorem dist_eq_iSup {α β} [TopologicalSpace α] [CompactSpace α] [MetricSpace β]
-  {f g : C(α, β)} :
-    dist f g = ⨆ x, dist (f x) (g x) := by
-  convert BoundedContinuousFunction.dist_eq_iSup using 0
-
 namespace Homotopy
 
 @[simp] theorem trans_leftHalf_apply {X Y}
@@ -75,7 +72,7 @@ namespace Homotopy
   (a : Homotopy f g) (b : Homotopy g h) {t x} :
     (a.trans b) (rightHalf t, x) = b (t, x) := by
   simp only [trans_apply, rightHalf, coe_mk]
-  obtain rfl | ht : t = 0 ∨ 0 < (t : ℝ) := eq_or_gt_of_le t.2.1
+  obtain rfl | ht : t = 0 ∨ 0 < (t : ℝ) := eq_or_lt_of_le' t.2.1
   . simp only [Set.Icc.coe_zero, add_zero, le_refl, ↓reduceDIte]
     norm_num1
     simp only [Set.Icc.mk_one, apply_one, apply_zero]
@@ -97,13 +94,12 @@ namespace Homotopy
   have hd {f g : C(I × X, Y)} : BddAbove (Set.range fun x => dist (f x) (g x))
   . rw [← Set.image_univ]
     apply IsCompact.bddAbove_image isCompact_univ
-    rw [← continuous_iff_continuousOn_univ]
+    rw [continuousOn_univ]
     continuity
   apply le_antisymm
   . apply ciSup_le
     rintro ⟨t, x⟩
     simp_rw [trans_apply]
-    dsimp only
     split <;> [ apply le_max_of_le_left; apply le_max_of_le_right ] <;> apply le_ciSup hd
   . apply max_le <;>
       apply ciSup_le <;>
@@ -222,7 +218,6 @@ theorem aux.q3_def : q 3 = (symmMap.prodMap (.id I) |>.comp <| leftHalf.prodMap 
   all_goals
   . push_cast
     simp only [Prod.dist_eq, Subtype.dist_eq, q0_x, q0_y, q1_x, q1_y, q2_x, q2_y, q3_x, q3_y,
-      leftHalf, rightHalf, unitInterval.symm, ContinuousMap.coe_mk,
       add_div, dist_add_left, dist_sub_left, Real.dist_eq, ← sub_div, abs_div, abs_two,
       max_div_div_right (show 0 ≤ (2 : ℝ) by norm_num), max_comm]
 
@@ -266,7 +261,7 @@ theorem aux.zero_l_apply t :
       (t, p 0) := by
   simp only [aux, base_l, trans_apply, cast_coe, prod_coe,
     refl_apply, map_coe, Function.comp_apply]
-  split_ifs <;> simp [leftHalf, rightHalf, mul_div_cancel_left]
+  split_ifs <;> simp [leftHalf, rightHalf]
 
 @[simp]
 theorem aux.zero_i_apply t :
@@ -330,7 +325,7 @@ theorem aux.succ_l_apply n t :
     -- show 2 * t - 1 ≤ 1 / 2 ↔ t ≤ 3 / 4 by constructor <;> intro <;> linarith]
   split_ifs <;> first
   | exfalso; linarith
-  | simp only [Nat.add_eq, Nat.add_zero, unitInterval.symm, autoCast, Path.map_symm, Path.cast_coe,
+  | simp only [unitInterval.symm, autoCast, Path.map_symm, Path.cast_coe,
       Path.map_coe, Fin.isValue, Function.comp_apply, Path.symm_apply, t0, t1, t2, t3]
     congr 3
     linarith
@@ -374,7 +369,7 @@ theorem aux.succ_i_apply n t :
   . simp only [aux]
     rw [Path.trans_apply, dite_cond_eq_true (eq_true <| by dsimp; linarith),
       Path.trans_apply, dite_cond_eq_true (eq_true <| by dsimp; linarith)]
-    simp [t0, t1, t2, t3, show 2 * (2 * t) = 4 * t by linarith]
+    simp [t0, show 2 * (2 * t) = 4 * t by linarith]
   . repeat rw [← aux.succ_shared_apply n (by dsimp; linarith), aux.succ_l_apply]
     split <;> rename_i h'
     . contradiction
@@ -427,9 +422,9 @@ theorem not_mem_squareBoundary x y :
   rw [mem_squareBoundary]
   simp_rw [not_or, ← Subtype.coe_inj]
   congr!
-  . exact x.2.1.gt_iff_ne.symm
+  . exact x.2.1.lt_iff_ne'.symm
   . exact x.2.2.lt_iff_ne.symm
-  . exact y.2.1.gt_iff_ne.symm
+  . exact y.2.1.lt_iff_ne'.symm
   . exact y.2.2.lt_iff_ne.symm
 
 lemma aux.q_mem_squareBoundary {n x} (hx : q n x ∈ squareBoundary) :
@@ -451,7 +446,7 @@ lemma aux.line_mem_squareBoundary {x y} {t} (h : line x y t ∈ squareBoundary) 
   contrapose! h
   obtain rfl | ht₀ : t = 0 ∨ 0 < (t : ℝ) := by
     rw [← Subtype.coe_inj]
-    exact t.2.1.eq_or_gt
+    exact t.2.1.eq_or_lt'
   . simp only [Path.source, h.1]; trivial
   obtain rfl | ht₁ : t = 1 ∨ (t : ℝ) < 1 := by
     rw [← Subtype.coe_inj]
@@ -537,7 +532,7 @@ theorem aux.homotopy_i_boundary n t ⦃x⦄ :
 theorem aux.q_inter {i j} (hij : i ≠ j) {a b} (h : q i a = q j b) :
     a ∈ squareBoundary ∧ b ∈ squareBoundary := by
   wlog hlt : i < j
-  . exact .symm <| this hij.symm h.symm <| (le_of_not_lt hlt).lt_of_ne hij.symm
+  . exact .symm <| this hij.symm h.symm <| (le_of_not_gt hlt).lt_of_ne hij.symm
   fin_cases i <;> fin_cases j <;> push_cast at * <;> clear hij hlt
   all_goals
   . rw [Prod.mk.injEq] at h
@@ -563,7 +558,7 @@ theorem linearHomotopy_timewise_injective_iff f g :
     change line (f x) (g x) t = line (f y) (g y) t ↔ _
     simp only [← squareCoe_inj, line_def]
     simp_rw [AffineMap.lineMap_apply]
-    simp only [vsub_eq_sub, vadd_eq_add, smul_add, smul_sub]
+    simp only [vsub_eq_sub, vadd_eq_add, smul_sub]
     rw [← sub_eq_zero, ← neg_eq_zero]
     ring_nf
   constructor
@@ -575,7 +570,7 @@ theorem linearHomotopy_timewise_injective_iff f g :
   case mpr =>
     intro h t x y hc
     wlog hxy : x ≤ y generalizing x y
-    . exact symm <| this hc.symm <| le_of_not_le hxy
+    . exact symm <| this hc.symm <| le_of_not_ge hxy
     refine hxy.eq_or_lt.elim id (fun hxy => h hxy |>.elim ?_)
     exists t.1, t.2
     rwa [← this]
@@ -637,11 +632,12 @@ def aux.e : (ℝ × ℝ) ≃L[ℝ] EuclideanSpace ℝ (Fin 2) :=
 -- TODO move this
 @[simp] theorem EuclideanSpace.real_inner_two_apply (x y : EuclideanSpace ℝ (Fin 2)) :
     ⟪x, y⟫ = x 0 * y 0 + x 1 * y 1 := by
-  simp; ring
+
+  simp [EuclideanSpace.inner_eq_star_dotProduct]; ring
 
 @[simp] theorem EuclideanSpace.real_inner_two_apply_mk (a b c d : ℝ) :
     @inner ℝ (EuclideanSpace ℝ (Fin 2)) _ ![a, b] ![c, d] = a * c + b * d := by
-  simp; ring
+  simp
 
 @[simp] theorem vec_two_ext {α} {a b c d : α} :
     ![a, b] = ![c, d] ↔ a = c ∧ b = d := by
@@ -661,7 +657,10 @@ def aux.e : (ℝ × ℝ) ≃L[ℝ] EuclideanSpace ℝ (Fin 2) :=
 -- But yeah, these proofs are pretty slow. Seems important to change
 -- if I want to e.g. run everything when I update Mathlib to detect breakage
 
-set_option maxHeartbeats 1000000 in
+-- future future self here, i had to bump up maxHeartbeats lol.
+-- maybe i should fix this at some point
+
+set_option maxHeartbeats 5000000 in
 theorem aux.homotopy_l_injective_zero : ∀ t, Function.Injective (aux.homotopy_l 0 |>.curry t) := by
   rw [homotopy_l, linearHomotopy_timewise_injective_iff]
   intro x y hxy
@@ -669,7 +668,7 @@ theorem aux.homotopy_l_injective_zero : ∀ t, Function.Injective (aux.homotopy_
   rw [mem_segment_iff_wbtw, ← e.toAffineEquiv.wbtw_map_iff, ← mem_segment_iff_wbtw]
   simp_rw [LinearEquiv.coe_toAffineEquiv, ContinuousLinearEquiv.coe_toLinearEquiv, map_zero]
   rw [segment_symm, zero_not_mem_segment_iff]
-  simp only [ContinuousMap.coe_coe, zero_l_apply, zero_i_apply, succ_l_apply, succ_i_apply]
+  simp only [ContinuousMap.coe_coe, zero_l_apply, zero_i_apply, succ_l_apply]
   constructor
   case left =>
     split_ifs <;> simp only [t0, t1, t2, t3] at * <;> try (exfalso; linarith)
@@ -696,7 +695,7 @@ theorem aux.homotopy_l_injective_zero : ∀ t, Function.Injective (aux.homotopy_
         EuclideanSpace.real_inner_two_apply_mk]
       norm_num1; linarith
 
-set_option maxHeartbeats 1000000 in
+set_option maxHeartbeats 5000000 in
 theorem aux.homotopy_i_injective_zero : ∀ t, Function.Injective (aux.homotopy_i 0 |>.curry t) := by
   rw [homotopy_i, linearHomotopy_timewise_injective_iff]
   intro x y hxy
@@ -704,7 +703,7 @@ theorem aux.homotopy_i_injective_zero : ∀ t, Function.Injective (aux.homotopy_
   rw [mem_segment_iff_wbtw, ← e.toAffineEquiv.wbtw_map_iff, ← mem_segment_iff_wbtw]
   simp_rw [LinearEquiv.coe_toAffineEquiv, ContinuousLinearEquiv.coe_toLinearEquiv, map_zero]
   rw [segment_symm, zero_not_mem_segment_iff]
-  simp only [ContinuousMap.coe_coe, zero_l_apply, zero_i_apply, succ_l_apply, succ_i_apply]
+  simp only [ContinuousMap.coe_coe, zero_l_apply, zero_i_apply, succ_i_apply]
   constructor
   case left =>
     split_ifs <;> simp only [t0, t1, t2, t3] at * <;> try (exfalso; linarith)
@@ -782,8 +781,7 @@ theorem aux.homotopy_l_injective_succ n t
   apply Function.Injective.eq_iff at ih_i
   simp only [ContinuousMap.Homotopy.curry_apply] at ih_l ih_i
   intro x y
-  simp only [ContinuousMap.Homotopy.curry_apply,
-    homotopy_l_succ_eq, linearHomotopy_apply, ContinuousMap.coe_coe]
+  simp only [ContinuousMap.Homotopy.curry_apply, homotopy_l_succ_eq]
   split_ifs <;> first
   | intro h
     have h_boundary := q_inter (by decide) h
@@ -799,7 +797,7 @@ theorem aux.homotopy_l_injective_succ n t
       revert h
       simp only [← Subtype.coe_inj, q0_x, q0_y, q1_x, q1_y, q2_x, q2_y, q3_x, q3_y,
         homotopy_l, homotopy_i, linearHomotopy_apply, ContinuousMap.coe_coe,
-        line_def_x, line_def_y, Path.source, Path.target, not_and, p_succ]
+        line_def_x, line_def_y, Path.source, Path.target, p_succ]
       rcases t with ⟨t, ht₀, ht₁⟩
       set v := (p n : ℝ)
       push_cast
@@ -816,14 +814,12 @@ theorem aux.homotopy_i_injective_succ n t
   apply Function.Injective.eq_iff at ih_l
   simp only [ContinuousMap.Homotopy.curry_apply] at ih_l
   intro x y
-  simp only [ContinuousMap.Homotopy.curry_apply,
-    homotopy_i_succ_eq, linearHomotopy_apply, ContinuousMap.coe_coe]
+  simp only [ContinuousMap.Homotopy.curry_apply, homotopy_i_succ_eq]
   split_ifs <;> first
   | intro h
     have h_boundary := q_inter (by decide) h
     rw [← Subtype.coe_inj]
-    simp only [homotopy_l_boundary, homotopy_i_boundary,
-      t1_ne_zero, t2_ne_one, t3_ne_one] at h_boundary
+    simp only [homotopy_l_boundary, t1_ne_zero, t2_ne_one, t3_ne_one] at h_boundary
     rcases h_boundary with ⟨hx | hx, hy | hy⟩ <;> try contradiction
     all_goals
     . exfalso
@@ -832,8 +828,8 @@ theorem aux.homotopy_i_injective_succ n t
       rw [Prod.mk.injEq] at h
       revert h
       simp only [← Subtype.coe_inj, q0_x, q0_y, q1_x, q1_y, q2_x, q2_y, q3_x, q3_y,
-        homotopy_l, homotopy_i, linearHomotopy_apply, ContinuousMap.coe_coe,
-        line_def_x, line_def_y, Path.source, Path.target, not_and, p_succ]
+        homotopy_l, linearHomotopy_apply, ContinuousMap.coe_coe,
+        line_def_x, line_def_y, Path.source, Path.target, p_succ]
       rcases t with ⟨t, ht₀, ht₁⟩
       set v := (p n : ℝ)
       push_cast
@@ -867,11 +863,11 @@ open Metric Set
 -- the distance is sup Chebyshev.
 lemma aux.infDist_le_l_zero {y} : infDist y (range (aux 0).1) ≤ 1 := by
   apply infDist_le_dist_of_mem (mem_range.mpr ⟨0, rfl⟩) |>.trans
-  simp only [Prod.dist_eq, max_le, dist_le_one, implies_true]
+  simp only [Prod.dist_eq, max_le, dist_le_one]
 
 lemma aux.infDist_le_i_zero {y} : infDist y (range (aux 0).2) ≤ 1 := by
   apply infDist_le_dist_of_mem (mem_range.mpr ⟨0, rfl⟩) |>.trans
-  simp only [Prod.dist_eq, max_le, dist_le_one, implies_true]
+  simp only [Prod.dist_eq, max_le, dist_le_one]
 
 -- TODO move these i guess?
 def aux.q0_inv (x y : I)
@@ -914,7 +910,7 @@ lemma aux.range_l_succ n :
     q 1 '' range (aux n).1 ∪
     q 2 '' range (aux n).1 ∪
     q 3 '' range (aux n).1 := by
-  simp only [aux, Nat.add_eq, Nat.add_zero, Path.trans_range, autoCast, Path.cast,
+  simp only [aux, Path.trans_range, autoCast, Path.cast,
     Path.coe_mk_mk, Path.map_coe, Path.map_symm, Path.symm_range, range_comp, union_assoc]
 
 lemma aux.range_i_succ n :
@@ -923,7 +919,7 @@ lemma aux.range_i_succ n :
     q 1 '' range (aux n).1 ∪
     q 2 '' range (aux n).1 ∪
     q 3 '' range (aux n).1 := by
-  simp only [aux, Nat.add_eq, Nat.add_zero, Path.trans_range, autoCast, Path.cast,
+  simp only [aux, Path.trans_range, autoCast, Path.cast,
     Path.coe_mk_mk, Path.map_coe, Path.map_symm, Path.symm_range, range_comp, union_assoc]
 
 lemma aux.infDist_le_l_succ n {y}
@@ -935,19 +931,19 @@ lemma aux.infDist_le_l_succ n {y}
     rw [csInf_union
       (by simp only [bddBelow_union, range_comp, lol, and_self])
       (by simp only [union_nonempty, range_nonempty, or_self])
-      (by simp only [bddBelow_union, range_comp, lol])
-      (by simp only [union_nonempty, range_nonempty, or_self])]
+      (by simp only [range_comp, lol])
+      (by simp only [range_nonempty])]
   clear lol
   simp_rw [inf_le_iff, Function.comp_def]
   rcases y with ⟨x, y⟩
   by_cases hx : (x : ℝ) ≤ 1/2 <;> by_cases hy : (y : ℝ) ≤ 1/2 <;>
     [ (rw [← q0_inv_apply hx hy]
        refine .inl <| .inl <| .inl ?_)
-    ; (rw [← q1_inv_apply hx (le_of_not_le hy)]
+    ; (rw [← q1_inv_apply hx (le_of_not_ge hy)]
        refine .inl <| .inl <| .inr ?_)
-    ; (rw [← q3_inv_apply (le_of_not_le hx) hy]
+    ; (rw [← q3_inv_apply (le_of_not_ge hx) hy]
        refine .inr <| ?_)
-    ; (rw [← q2_inv_apply (le_of_not_le hx) (le_of_not_le hy)]
+    ; (rw [← q2_inv_apply (le_of_not_ge hx) (le_of_not_ge hy)]
        refine .inl <| .inr <| ?_)
     ]
   all_goals
@@ -965,19 +961,19 @@ lemma aux.infDist_le_i_succ n {y}
     rw [csInf_union
       (by simp only [bddBelow_union, range_comp, lol, and_self])
       (by simp only [union_nonempty, range_nonempty, or_self])
-      (by simp only [bddBelow_union, range_comp, lol])
-      (by simp only [union_nonempty, range_nonempty, or_self])]
+      (by simp only [range_comp, lol])
+      (by simp only [range_nonempty])]
   clear lol
   simp only [inf_le_iff, Function.comp_def]
   rcases y with ⟨x, y⟩
   by_cases hx : (x : ℝ) ≤ 1/2 <;> by_cases hy : (y : ℝ) ≤ 1/2 <;>
     [ (rw [← q0_inv_apply hx hy]
        refine .inl <| .inl <| .inl ?_)
-    ; (rw [← q1_inv_apply hx (le_of_not_le hy)]
+    ; (rw [← q1_inv_apply hx (le_of_not_ge hy)]
        refine .inl <| .inl <| .inr ?_)
-    ; (rw [← q3_inv_apply (le_of_not_le hx) hy]
+    ; (rw [← q3_inv_apply (le_of_not_ge hx) hy]
        refine .inr <| ?_)
-    ; (rw [← q2_inv_apply (le_of_not_le hx) (le_of_not_le hy)]
+    ; (rw [← q2_inv_apply (le_of_not_ge hx) (le_of_not_ge hy)]
        refine .inl <| .inr <| ?_)
     ]
   all_goals
@@ -1275,7 +1271,7 @@ theorem aux.dist_partialHomotopyBuilder n {f₁ f₂} h₁ h₂ :
 
 theorem aux.dist_le_partialHomotopy n :
     dist (α := C(I × I, I × I)) (partialHomotopy n) (partialHomotopy (n + 1)) ≤ 1 / 2 ^ n := by
-  simp only [partialHomotopy, partialHomotopyBuilder, Nat.add_eq, Nat.add_zero]
+  simp only [partialHomotopy, partialHomotopyBuilder]
   rw [dist_partialHomotopyBuilder, ← ContinuousMap.Homotopy.refl_trans_refl,
     ContinuousMap.Homotopy.dist_trans]
   apply max_le
@@ -1318,7 +1314,7 @@ lemma aux.partialHomotopyBuilder_apply n {f} h t x :
   | zero => simp [partialHomotopyBuilder]
   | succ n ih =>
     conv => congr; ext m; rw [Nat.lt_succ_iff_lt_or_eq, or_comm]
-    simp only [forall_eq_or_imp, partialHomotopyBuilder, Nat.add_eq, Nat.add_zero,
+    simp only [forall_eq_or_imp, partialHomotopyBuilder,
       Function.iterate_succ, Function.comp_apply]
     specialize ih (homotopy_i n |>.trans h)
     exact ⟨⟨ih (leftHalf t) |>.2 |>.trans <| ContinuousMap.Homotopy.trans_leftHalf_apply _ _, (ih t).1⟩,
@@ -1330,7 +1326,7 @@ theorem aux.partialHomotopy_apply_lt n m (hm : m < n) {t x : I}
     homotopy_i m (⟨2 ^ (m+1) * (t - (1 - 1 / 2 ^ m)), by
       rw [Set.mem_Icc]
       ring_nf at *
-      simp_rw [← mul_pow, div_mul_cancel₀ _ (show (2 : ℝ) ≠ 0 by norm_num), one_pow] at *
+      simp_rw [← mul_pow, inv_mul_cancel₀ (show (2 : ℝ) ≠ 0 by norm_num), one_pow] at *
       set v : ℝ := 2 ^ m
       constructor <;> linarith⟩, x) := by
   convert partialHomotopyBuilder_apply n _ _ x |>.1 m hm
@@ -1362,7 +1358,7 @@ theorem aux.partialHomotopy_curry_lt n m (hm : m < n) {t : I}
     (homotopy_i m).curry ⟨2 ^ (m+1) * (t - (1 - 1 / 2 ^ m)), by
       rw [Set.mem_Icc]
       ring_nf at *
-      simp_rw [← mul_pow, div_mul_cancel₀ _ (show (2 : ℝ) ≠ 0 by norm_num), one_pow] at *
+      simp_rw [← mul_pow, inv_mul_cancel₀ (show (2 : ℝ) ≠ 0 by norm_num), one_pow] at *
       set v : ℝ := 2 ^ m
       constructor <;> linarith⟩ := by
   simp_rw [DFunLike.ext_iff, ContinuousMap.Homotopy.curry_apply]

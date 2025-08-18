@@ -34,7 +34,7 @@ def zero : UpTo 0 0 where
   sum_parts := by simp
 
 def cons {n k} v (h : k < v) (a : UpTo n k) : UpTo (n + v ^ 3) v where
-  parts := a.parts.cons v fun hv => a.parts_bdd _ hv |>.2.not_lt h
+  parts := a.parts.cons v fun hv => a.parts_bdd _ hv |>.2.not_gt h
   parts_bdd p := by
     rw [mem_cons]
     rintro (rfl | hp)

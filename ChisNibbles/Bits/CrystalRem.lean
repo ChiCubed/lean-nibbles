@@ -15,7 +15,7 @@ theorem crystalrem (n : ℕ) : ¬ n.sqrt ^ 2 + 2 ∣ n ^ 2 + 1 := by
   let k : ℤ := n - n.sqrt ^ 2
   replace h : (n.sqrt ^ 2 + 2 : ℤ) ∣ (k - 2) ^ 2 + 1
   . convert h.sub <| dvd_mul_left _ (n + k - 2) using 1; ring
-  obtain hk | hk := lt_or_le k 2
+  obtain hk | hk := lt_or_ge k 2
   . have k_nn : 0 ≤ k := sub_nonneg.mpr <| by exact_mod_cast n.sqrt_le'
     interval_cases k <;> norm_num at h <;> norm_cast at h <;>
       rw [Nat.dvd_prime (by norm_num)] at h

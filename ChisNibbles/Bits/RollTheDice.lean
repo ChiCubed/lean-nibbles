@@ -66,7 +66,7 @@ theorem lintegral_eq_tsum_meas_lt
 
   suffices ∀ a ∈ Ioc (α := ℝ) i (i + 1),
       μ {ω | ENNReal.ofReal a ≤ f ω} = μ {ω | i < f ω} by
-    rw [setLIntegral_congr_fun (by simp) (.of_forall this)]
+    rw [setLIntegral_congr_fun (by simp) this]
     simp
   rw [h_Ioc]
   intro a ha

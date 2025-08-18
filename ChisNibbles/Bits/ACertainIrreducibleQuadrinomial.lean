@@ -44,7 +44,7 @@ theorem trunc_X_pow_eq_ite (n : ℕ) (k : ℕ) :
   ext i
   rw [trunc_coeff_eq_ite, apply_ite (coeff (R := R) · i)]
   simp only [coeff_X_pow, coeff_zero, ← ite_and]
-  aesop
+  grind
 
 theorem trunc_X_eq_ite (n : ℕ) :
     trunc n (X : R[X]) = if 1 < n then X else 0 := by
@@ -389,25 +389,24 @@ lemma main₁.aux
   replace hk_nz := hj_pos k (.inr rfl) hk_nz
   -- and now just finish up
   -- (this code sucks but if it works it works)
+  -- TODO: edit
   rcases hk_nz with fg_k | fg_k <;>
       rw [Prod.mk.injEq] at fg_k <;>
       rcases fg_k with ⟨f_k, g_k⟩
   . existsi {1, k}, by simp
     constructor
     . ext i
-      obtain hi | hi := lt_or_le i (k + 1)
+      obtain hi | hi := lt_or_ge i (k + 1)
       . rw [trunc_coeff_eq_of_lt _ _ hi]
         obtain hi | rfl : i < k ∨ k = i := by clear * - hi; omega
         . rw [f_lt_k i hi]
           simp [hi.ne]
-          split_ifs <;> omega
         . simp [f_k]
       . clear * - hi hk
         rw [trunc_coeff_eq_zero _ _ hi]
-        simp [hi]
-        split <;> omega
+        simp; omega
     . ext i
-      obtain hi | hi := lt_or_le i (k + 1)
+      obtain hi | hi := lt_or_ge i (k + 1)
       . rw [trunc_coeff_eq_of_lt _ _ hi]
         obtain hi | rfl : i < k ∨ k = i := by clear * - hi; omega
         . rw [g_lt_k i hi]
@@ -415,33 +414,29 @@ lemma main₁.aux
         . simp [g_k, show ¬ k = 0 by omega]
       . clear * - hi hk
         rw [trunc_coeff_eq_zero _ _ hi]
-        simp [hi]
-        split <;> omega
+        simp; omega
   . existsi {1}, by simp
     constructor
     . ext i
-      obtain hi | hi := lt_or_le i (k + 1)
+      obtain hi | hi := lt_or_ge i (k + 1)
       . rw [trunc_coeff_eq_of_lt _ _ hi]
         obtain hi | rfl : i < k ∨ k = i := by clear * - hi; omega
         . rw [f_lt_k i hi]
-          simp [hi.ne]
-        . simp [f_k]; split <;> omega
+          simp
+        . simp [f_k]; omega
       . clear * - hi hk
         rw [trunc_coeff_eq_zero _ _ hi]
-        simp [hi]
-        split <;> omega
+        simp; omega
     . ext i
-      obtain hi | hi := lt_or_le i (k + 1)
+      obtain hi | hi := lt_or_ge i (k + 1)
       . rw [trunc_coeff_eq_of_lt _ _ hi]
         obtain hi | rfl : i < k ∨ k = i := by clear * - hi; omega
         . rw [g_lt_k i hi]
           simp; split_ifs <;> omega
-        . simp [g_k]
-          split <;> omega
+        . simp; omega
       . clear * - hi hk
         rw [trunc_coeff_eq_zero _ _ hi]
-        simp [hi]
-        split <;> omega
+        simp; omega
 
 
 
@@ -636,7 +631,7 @@ namespace main₁
         replace this' : ∀ i ∉ ix, s.q.coeff i = 0 := fun i hi =>
           if h : i ∈ s.q.support
             then this' i <| Finset.mem_sdiff.mpr ⟨h, hi⟩
-            else not_mem_support_iff.mp h
+            else notMem_support_iff.mp h
         clear nodup finset ix_card
         clear_value ix
         ext i; aesop
@@ -748,7 +743,7 @@ theorem main₂ : IsRelPrime d.p d.p.mirror := by
     rw [isCoprime_iff_aeval_ne_zero]
     intro A _ _ _ a
     have := algebraRat.charZero A
-    simp only [map_add, map_pow, map_one, map_sub, aeval_X]
+    simp only [map_add, map_pow, map_one, aeval_X]
     by_contra! h; rcases h with ⟨hf, hg⟩
     rw [add_eq_zero_iff_eq_neg] at hf hg
     suffices (a ^ n) ^ (m - 1) ≠ (a ^ (m - 1)) ^ n from absurd (pow_right_comm ..) this

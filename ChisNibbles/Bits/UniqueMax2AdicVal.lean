@@ -17,9 +17,9 @@ theorem padicValNat.val_2_lt_add_of_eq
   have hab : 0 < a + b := by positivity
   rw [← PartENat.coe_lt_coe]
   apply congrArg (Nat.cast (R := PartENat)) at h
-  simp_all only [add_pos_iff, or_self, padicValNat_eq_maxPowDiv, Nat.one_lt_ofNat,
-    Nat.finiteMultiplicity_iff, ne_eq, OfNat.ofNat_ne_one, not_false_eq_true, and_self,
-    maxPowDiv_eq_multiplicity, Nat.cast_inj, Nat.cast_lt]
+  simp_all only [add_pos_iff, or_self, padicValNat_eq_maxPowDiv, one_lt_two, ne_eq, ne_of_gt,
+    not_false_eq_true, Nat.finiteMultiplicity_iff, and_true, maxPowDiv_eq_multiplicity,
+    Nat.cast_inj, Nat.cast_lt]
   set va := multiplicity 2 a
   set vb := multiplicity 2 b
   have v_fin {x} (h : 0 < x) := @Nat.finiteMultiplicity_iff 2 x |>.mpr (by omega)

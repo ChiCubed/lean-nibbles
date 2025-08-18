@@ -139,8 +139,7 @@ example
       rw [Nat.add_zero] at hn' hs
       use 24, by decide, oks (n + 24) ?_ (.inr ∘ .inl <| hn'.add dvd_rfl)
       intro hs'
-      have := Nat.dvd_sub (Nat.le_add_right _ _)
-        (some_kinda_lemma hs' (by simpa)) (some_kinda_lemma hs hn')
+      have := Nat.dvd_sub (some_kinda_lemma hs' (by simpa)) (some_kinda_lemma hs hn')
       replace this : 144 ∣ 24 := by simpa
       norm_num at this
     | succ i =>

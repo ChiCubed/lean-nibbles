@@ -27,5 +27,5 @@ theorem thingy
   | zero =>
     simp [h₀]
   | succ n ih =>
-    rw [range_add_one, sum_insert not_mem_range_self]
+    rw [range_add_one, sum_insert notMem_range_self]
     cases h₁ n with | _ h => rw [h]; push_cast; linarith

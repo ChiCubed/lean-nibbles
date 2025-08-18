@@ -77,7 +77,7 @@ def hilbert : @IsWalkable (I × I) (fun x => ![x.1, x.2]) (fun x => ![invHilbert
           (map_continuous _)
           (.prodMk continuous_id continuous_const)))
       (by simp)
-      (by simp [squareCoe]; rw [hilbertCurve_invHilbertCurve])
+      (by simp [squareCoe])
     intro t
     simp only [Path.coe_mk_mk]
     apply aux.e.injective.comp

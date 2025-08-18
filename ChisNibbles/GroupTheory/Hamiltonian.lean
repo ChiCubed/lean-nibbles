@@ -352,7 +352,7 @@ lemma lift_to_prime_order (x y : G) {p : ℕ} (hp : p.Prime) (ho : orderOf ⁅x,
       orderOf ⁅x', y⁆ = p ∧ IsOfFinOrder x' ∧
       ∃ n : ℕ, orderOf x' = p ^ (n + 1) := by
   have ⟨b, ox', b_ndvd⟩ := FiniteMultiplicity.exists_eq_pow_mul_and_not_dvd $
-    .of_not_isUnit hp.not_unit ox.orderOf_pos.ne'
+    .of_not_isUnit hp.not_isUnit ox.orderOf_pos.ne'
   have b_nz : b ≠ 0 := fun h => h ▸ b_ndvd $ dvd_zero _
 
   let x' := x ^ b
@@ -701,7 +701,7 @@ lemma not_order_four_in_centralizer (g : C) :
 
 
 instance quaternion_centralizer.commutative :
-    Subgroup.IsCommutative C where
+    IsMulCommutative C where
   is_comm.comm a b := by
     by_contra h
     haveI hC : IsHamiltonian C :=
@@ -746,7 +746,7 @@ def odd_component : Subgroup C where
   mul_mem' := by
     haveI := quaternion_centralizer.commutative ϕ
     intro a b hm hn
-    simp only [Set.mem_setOf_eq, not_not] at *
+    simp only [Set.mem_setOf_eq] at *
     have hh := hm.mul hn
     simp only [← Nat.not_even_iff_odd, even_iff_two_dvd] at hh ⊢
     exact fun h => hh $ h.trans (Commute.all a b).orderOf_mul_dvd_mul_orderOf

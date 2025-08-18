@@ -58,7 +58,7 @@ theorem woo (n : ℕ) (a u v : ℕ → ℤ)
       transpose_1x1 _ |>.symm
     _ = !![(1 : ℤ), 0] * _ᵀ * !![(1 : ℤ); 1]              := by
       simp_rw [transpose_mul, ← Matrix.mul_assoc]
-      congr <;> exact transposeᵣ_eq _ |>.symm
+      congrm ?_ * _ * ?_ <;> exact transposeᵣ_eq _ |>.symm
     _ = (!![(1 : ℤ), 1] * ⅟B) * _ * (B * !![(1 : ℤ); 0])  := by
       congr <;> decide
     _ = !![(1 : ℤ), 1] * (⅟B * _ᵀ * B) * !![(1 : ℤ); 0]   := by
@@ -67,7 +67,7 @@ theorem woo (n : ℕ) (a u v : ℕ → ℤ)
   congr
   rw [transpose_list_prod, invOf_eq_nonsing_inv, conjugate_list_prod]
   simp only [← map_reverse, List.map_map, range_eq_range', reverse_range']
-  congr
+  congr 2
   funext i
   dsimp only [Function.comp]
   rw [← transposeᵣ_eq, ← invOf_eq_nonsing_inv B, zero_add, add_tsub_cancel_right]

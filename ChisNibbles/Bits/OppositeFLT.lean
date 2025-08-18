@@ -20,7 +20,7 @@ example (a b c : ℤ) (h : (2 : ℚ) ^ a = 2 ^ b + 2 ^ c) : b = c := by
     simpa using this (a - a) (b - a) (c - a) h (sub_self a)
   subst ha
   wlog hbc : b ≤ c generalizing b c h
-  . exact symm <| this c b (h.trans <| add_comm _ _) (le_of_not_le hbc)
+  . exact symm <| this c b (h.trans <| add_comm _ _) (le_of_not_ge hbc)
   have hc₁ : 0 ≤ c + 1
   . rwa [← pow_two_mono.le_iff_le, h, zpow_add₀ two_nz, zpow_one, mul_two,
       add_le_add_iff_right, pow_two_mono.le_iff_le]

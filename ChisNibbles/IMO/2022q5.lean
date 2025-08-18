@@ -1,6 +1,8 @@
 import Mathlib.NumberTheory.Basic
 import Mathlib.Data.ZMod.Basic
 import Mathlib.Algebra.BigOperators.Intervals
+import Mathlib.Tactic.Zify
+import Mathlib.Tactic.Linarith
 
 -- This is a port from Lean 3, and man, the current `omega` tactic is *so* convenient.
 
@@ -46,7 +48,7 @@ lemma weak_fac_bound (n : ℕ) : n ! ≤ n ^ n := by
   cases' n with n
   case zero => norm_num
   apply fac_bound (n+1) |>.trans
-  gcongr <;> omega
+  gcongr; omega
 
 lemma pow_add_lt_aux (a : ℕ) : ∀ n : ℕ,
     (a+1) ^ (n+2) + (n+2) < (a+2) ^ (n+2)
@@ -63,7 +65,7 @@ lemma pow_add_lt_aux (a : ℕ) : ∀ n : ℕ,
 -- if < were ≤ we could remove n_large
 lemma pow_add_lt {a b n : ℕ} (a_pos : 0 < a) (n_large : 2 ≤ n) (a_lt_b : a < b) :
     a^n + n < b^n := by
-  suffices a^n + n < (a+1)^n from this.trans_le $ by gcongr <;> omega
+  suffices a^n + n < (a+1)^n from this.trans_le $ by gcongr; omega
   obtain ⟨a, rfl⟩ := Nat.exists_eq_add_of_lt a_pos
   obtain ⟨n, rfl⟩ := Nat.exists_eq_add_of_le n_large
   convert pow_add_lt_aux a n using 2 <;> ring
@@ -104,7 +106,7 @@ theorem q5 (a b p : ℕ) :
       _       < a^p     := pow_add_lt b_pos hp.two_le lt_a
 
   have b_lt_ndvd {n} (n_pos : 0 < n) : ¬ n ∣ b ! → b < n :=
-    lt_of_not_le ∘ mt (dvd_factorial n_pos)
+    lt_of_not_ge ∘ mt (dvd_factorial n_pos)
 
   obtain ⟨m, rfl⟩ : p ∣ a := by
     by_contra p_ndvd_a
@@ -194,7 +196,7 @@ theorem q5 (a b p : ℕ) :
       p ! + p = p * o ! + p       := by rw [factorial_succ]
       _       ≤ p * o ^ o + p     := by gcongr; apply weak_fac_bound
       _       = p * (o ^ o + 1)   := by ring
-      _       < p * (o ^ o + 2*k) := by gcongr <;> omega
+      _       < p * (o ^ o + 2*k) := by gcongr; omega
       _       < p * (p ^ o)       := ?_
       _       = p ^ p             := by rw [← Nat.pow_succ']
     gcongr
@@ -214,10 +216,10 @@ theorem q5 (a b p : ℕ) :
     -- case sorted | prod_eq => simp; omega
     case sorted =>
       simp only [List.Sorted, ← List.chain'_iff_pairwise,
-        List.chain'_cons, List.chain'_singleton, and_true]
+        List.chain'_cons_cons, List.chain'_singleton, and_true]
       omega
     case prod_eq =>
-      simp only [mem_mk, Multiset.mem_coe, List.mem_cons, List.mem_singleton,
+      simp only [mem_mk, Multiset.mem_coe, List.mem_cons,
         List.not_mem_nil, or_false, forall_eq_or_imp, forall_eq]
       omega
   absurd con₁; clear con₁
@@ -233,11 +235,11 @@ theorem q5 (a b p : ℕ) :
   norm_cast at h
 
   have con : ¬ p + 1 ∣ p * o * ∑ i ∈ range k, (p ^ 2) ^ i := by
-    rw [← ZMod.natCast_zmod_eq_zero_iff_dvd]
+    rw [← ZMod.natCast_eq_zero_iff]
     have : (o : ZMod (p + 1)) = -2 := by
       rw [← sub_eq_zero, sub_neg_eq_add]
       norm_cast
-      rw [ZMod.natCast_zmod_eq_zero_iff_dvd]
+      rw [ZMod.natCast_eq_zero_iff]
     unfold p; push_cast; rw [this]; norm_num1
     simp only [one_pow, sum_const, card_range, smul_one_eq_cast]
     norm_cast

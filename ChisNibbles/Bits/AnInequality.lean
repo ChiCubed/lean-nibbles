@@ -29,7 +29,8 @@ example
 set_option autoImplicit true
 
 theorem Finset.prod_abs
-  [LinearOrderedCommRing β] {ι : Type*} (s : Finset ι) (f : ι → β) :
+  [CommRing β] [LinearOrder β] [IsStrictOrderedRing β]
+  {ι : Type*} (s : Finset ι) (f : ι → β) :
     |∏ i ∈ s, f i| = ∏ i ∈ s, |f i| := by
   induction s using Finset.cons_induction <;> simp [abs_mul, *]
 

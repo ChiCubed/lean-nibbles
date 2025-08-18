@@ -9,7 +9,7 @@ open Finset
 lemma your_name
   (x m : ℕ) (hx : x ≤ m) :
     x = card (filter (· ≤ x) (Icc 1 m)) := by
-  rw [← Nat.Ico_succ_right]
+  rw [← Ico_succ_right_eq_Icc]
   simp_rw [← Nat.lt_succ_iff]
   rw [Ico_filter_lt]
   simp; omega
@@ -62,7 +62,7 @@ theorem flippysum (n : ℕ) (hn : n ≥ 2) :
     apply Nat.eq_sub_of_add_eq
     simp_rw [card_filter]
     have : 1 ≤ n := by omega
-    nth_rw 2 [← sum_Ioc_add_left (by exact this)]
+    nth_rw 2 [← sum_Ioc_add_eq_sum_Icc (by exact this)]
     congr 1
     simp [this]
   rw [sum_congr rfl fun j hj => h₁ j (by have := mem_Icc.mp hj; omega)]
@@ -76,9 +76,9 @@ theorem flippysum (n : ℕ) (hn : n ≥ 2) :
   zify [h]
   simp only [sum_sub_distrib, sum_const, Nat.card_Icc,
     add_tsub_cancel_right, nsmul_eq_mul, mul_one]
-  rw [← sum_Ioc_add_left (by omega), ← Nat.Icc_succ_left]
-  simp only [Nat.succ_eq_add_one, Nat.reduceAdd, one_div, Nat.cast_one, ne_eq, one_ne_zero,
-    not_false_eq_true, div_self, Real.rpow_one, Nat.floor_natCast, add_sub_cancel_right]
+  rw [← sum_Ioc_add_eq_sum_Icc (by omega), ← Icc_succ_left_eq_Ioc]
+  simp only [one_div, Nat.cast_one, ne_eq, one_ne_zero, not_false_eq_true,
+    div_self, Real.rpow_one, Nat.floor_natCast, add_sub_cancel_right]
   congr; ext x
   rw [Int.natCast_floor_eq_floor]
   positivity
