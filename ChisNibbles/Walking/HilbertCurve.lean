@@ -673,11 +673,12 @@ theorem aux.homotopy_l_injective_zero : ∀ t, Function.Injective (aux.homotopy_
   case left =>
     split_ifs <;> simp only [t0, t1, t2, t3] at * <;> try (exfalso; linarith)
     all_goals
-    . simp only [squareCoe, q0_x, q0_y, q1_x, q1_y, q2_x, q2_y, q3_x, q3_y,
+      simp only [squareCoe, q0_x, q0_y, q1_x, q1_y, q2_x, q2_y, q3_x, q3_y,
         p_zero, map_sub, e_apply_mk, sub_ne_zero]
       apply mt vec_two_ext.mp
       rintro ⟨h₁, h₂⟩
-      norm_num1 at h₁ h₂ <;> linarith
+      (try norm_num1 at h₁ h₂) <;> linarith
+
   by_cases hy : (y : ℝ) ≤ 1/2 <;>
     [ exists ![0, 1]; exists ![1, 0] ] <;>
     constructor
@@ -690,7 +691,7 @@ theorem aux.homotopy_l_injective_zero : ∀ t, Function.Injective (aux.homotopy_
   all_goals
   . split_ifs <;> simp only [t0, t1, t2, t3] at * <;> try (exfalso; linarith)
     all_goals
-    . simp only [squareCoe, q0_x, q0_y, q1_x, q1_y, q2_x, q2_y, q3_x, q3_y,
+      simp only [squareCoe, q0_x, q0_y, q1_x, q1_y, q2_x, q2_y, q3_x, q3_y,
         p_zero, map_sub, e_apply_mk, inner_sub_left,
         EuclideanSpace.real_inner_two_apply_mk]
       norm_num1; linarith
@@ -712,7 +713,7 @@ theorem aux.homotopy_i_injective_zero : ∀ t, Function.Injective (aux.homotopy_
         p_zero, map_sub, e_apply_mk, sub_ne_zero]
       apply mt vec_two_ext.mp
       rintro ⟨h₁, h₂⟩
-      norm_num1 at h₁ h₂ <;> linarith
+      (try norm_num1 at h₁ h₂) <;> linarith
   exists ![1, 0]
   constructor
   case right =>
