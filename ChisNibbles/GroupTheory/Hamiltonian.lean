@@ -1,5 +1,6 @@
 import Mathlib.Algebra.Group.Basic
 import Mathlib.Algebra.Group.Commutator
+import Mathlib.Algebra.Group.Subgroup.ZPowers.Lemmas
 import Mathlib.Algebra.Category.Grp.Basic
 import Mathlib.Algebra.Category.ModuleCat.Basic
 import Mathlib.Algebra.EuclideanDomain.Int
@@ -79,7 +80,7 @@ section orderOf
     . have ⟨m, hm⟩ := this (h.neg_left) (by omega)
       use -m; convert hm using 1; group
     lift n to ℕ using hn
-    have ⟨m, hm⟩ := exists_pow_eq_self_of_coprime (h.nat_coprime)
+    have ⟨m, hm⟩ := exists_pow_eq_self_of_coprime h.natCoprime
     use m; exact_mod_cast hm
 end orderOf
 
@@ -132,7 +133,7 @@ section groupExp
 
   noncomputable def groupExp [Group G] (h : orderOf x = n) :
       Multiplicative (ZMod n) ≃* zpowers x :=
-    AddEquiv.toMultiplicative'' $
+    AddEquiv.toMultiplicativeLeft <|
       addGroupExp (x := ofMul x) (by simpa) |>.trans <| .refl _
 
   @[simp] lemma addGroupExp_apply_coe [AddGroup G] (h : addOrderOf x = n) (i : ℤ) :
@@ -193,8 +194,8 @@ noncomputable def quaternionHom : Q₈ →* G :=
   .mk' (quaternionFun j oi) $ by
     rintro (a | a) (b | b) <;>
       change ZMod 4 at a b <;>
-      cases' a using ZMod.forall.mpr with a <;>
-      cases' b using ZMod.forall.mpr with b <;>
+      cases a using ZMod.forall.mpr with | _ a <;>
+      cases b using ZMod.forall.mpr with | _ b <;>
       simp only [a_mul_a, a_mul_xa, xa_mul_a, xa_mul_xa, quaternionFun] <;>
       (try rw [← Int.cast_natCast]) <;>
       simp only [← Int.cast_add, ← Int.cast_sub] <;>
@@ -221,7 +222,7 @@ lemma quaternionHom_injective : Function.Injective (quaternionHom oi hi hj) :=
   injective_iff_map_eq_one _ |>.mpr $ by
     rintro (a | a)
     . revert a; simp [quaternionHom_a]
-    . cases' a using ZMod.forall.mpr with a
+    . cases a using ZMod.forall.mpr with | _ a
       intro h
       rw [quaternionHom_xa, exp_i_apply_coe, mul_eq_one_iff_eq_inv, ← zpow_neg] at h
       absurd h ▸ hi
@@ -451,8 +452,8 @@ lemma canonicalise_of_prime_order {x y : G} {p : ℕ} (hp : p.Prime) {m n : ℕ}
   have ⟨a, ha, a_cp⟩ := decomp_of_prime_order (comm_in_zpowers_left x y) hp ox o
   have ⟨b, hb, b_cp⟩ := decomp_of_prime_order (comm_in_zpowers_right x y) hp oy o
 
-  obtain ⟨a', ha'⟩ := exists_mul_emod_eq_one_of_coprime a_cp.symm hp.one_lt
-  obtain ⟨b', hb'⟩ := exists_mul_emod_eq_one_of_coprime b_cp.symm hp.one_lt
+  obtain ⟨a', _, ha'⟩ := exists_mul_mod_eq_one_of_coprime a_cp.symm hp.one_lt
+  obtain ⟨b', _, hb'⟩ := exists_mul_mod_eq_one_of_coprime b_cp.symm hp.one_lt
   have ma : a' * a ≡ 1 [MOD p] := by rwa [← mod_eq_of_lt hp.one_lt, mul_comm] at ha'
   have mb : b' * b ≡ 1 [MOD p] := by rwa [← mod_eq_of_lt hp.one_lt, mul_comm] at hb'
   have a'_cp : p.Coprime a' := coprime_of_mul_modEq_one _ ma |>.symm
@@ -487,7 +488,7 @@ lemma embeds_quaternions : ∃ S : Subgroup G, Nonempty (Q₈ ≃* S) := by
   wlog hnm : n ≤ m generalizing n m i j
   . exact this j i n m (by rw [← commutatorElement_inv, orderOf_inv, o]) oj oi (by omega)
 
-  induction n using Nat.strong_induction_on generalizing i j with | h n ih =>
+  induction n using Nat.strong_induction_on generalizing i j with | h n ih
 
   have ⟨i', j', o', oi', hi', oj', hj'⟩ := canonicalise_of_prime_order hp o oi oj
   clear! i j; rename' i' => i, j' => j, o' => o, oi' => oi, hi' => hi, oj' => oj, hj' => hj
@@ -511,11 +512,13 @@ lemma embeds_quaternions : ∃ S : Subgroup G, Nonempty (Q₈ ≃* S) := by
     have n'_le : n' ≤ n := by
       rw [← Nat.pow_dvd_pow_iff_le_right hp.one_lt, ← oj',
           orderOf_dvd_iff_pow_eq_one, j'_pow]
-    cases' n' with n'
-    . rw [pow_zero, orderOf_eq_one_iff] at oj'
+    cases n' with
+    | zero =>
+      rw [pow_zero, orderOf_eq_one_iff] at oj'
       rw [oj', commutatorElement_one_right, orderOf_one] at o'
       exact absurd o'.symm hp.ne_one
-    exact ih n' (by omega) i j' o' oi oj' (by omega)
+    | succ n' =>
+      exact ih n' (by omega) i j' o' oi oj' (by omega)
   clear! ih j'
 
   obtain rfl : n = m := by
@@ -524,10 +527,12 @@ lemma embeds_quaternions : ∃ S : Subgroup G, Nonempty (Q₈ ≃* S) := by
     exact dvd_mul_of_dvd_left (dvd_pow_self _ sub_nz) _
   rw [tsub_self, pow_zero, one_mul] at hdvd
 
-  cases' n with n
-  . rw [pow_zero, pow_one] at hi
+  cases n with
+  | zero =>
+    rw [pow_zero, pow_one] at hi
     rw [← hi, comm_right i j |>.commutator_eq, orderOf_one] at o
     exact absurd o hp.ne_one.symm
+  | succ n
 
   clear hpI
   obtain rfl : p = 2 := hp.eq_two_or_odd'.resolve_right $ by
@@ -626,7 +631,7 @@ lemma comm_cases_of_order_dvd_four (x y : G) (ho : x ^ 4 = 1) :
     apply pow_orderOf_eq_one
   . rw [← zpow_mod_orderOf, ho', pow_two, Nat.cast_mul,
       show ((2 : ℕ) : ℤ) = (2 : ℤ) by norm_num, Int.mul_emod_mul_of_pos _ _ two_pos]
-    cases' Int.emod_two_eq_zero_or_one m with h h <;> rw [h]
+    cases Int.emod_two_eq_zero_or_one m with | _ h <;> rw [h]
     . left; simp
     . right; norm_cast
 
@@ -643,13 +648,15 @@ lemma centralize_of_comm_generators (x : G) :
 
   intro y hy
   lift y to Q using hy
-  induction y using transport_var ϕ with | _ y =>
+  induction y using transport_var ϕ with | _ y
 
   haveI : Fact (0 < 2 * 2) := ⟨by norm_num⟩
-  cases' y with y y
-  . rw [← ZMod.natCast_zmod_val y, ← QuaternionGroup.a_one_pow, map_pow]
+  cases y with
+  | a y =>
+    rw [← ZMod.natCast_zmod_val y, ← QuaternionGroup.a_one_pow, map_pow]
     exact hi.pow_left y.val
-  . rw [← zero_add y, ← QuaternionGroup.xa_mul_a 0 y, map_mul]
+  | xa y =>
+    rw [← zero_add y, ← QuaternionGroup.xa_mul_a 0 y, map_mul]
     rw [← ZMod.natCast_zmod_val y, ← QuaternionGroup.a_one_pow, map_pow]
     exact hj.mul_left $ hi.pow_left y.val
 
@@ -661,10 +668,10 @@ lemma group_eq_quaternion_mul_centraliser : Q ⊔ C = ⊤ := by
     have := mul_mem_sup q⁻¹.2 h
     simpa using this
 
-  cases' comm_cases_of_order_dvd_four (ϕ i : G) x
-    (by transport_group ϕ.symm) with hi hi <;>
-  cases' comm_cases_of_order_dvd_four (ϕ j : G) x
-    (by transport_group ϕ.symm) with hj hj <;>
+  cases comm_cases_of_order_dvd_four (ϕ i : G) x
+    (by transport_group ϕ.symm) with | _ hi <;>
+  cases comm_cases_of_order_dvd_four (ϕ j : G) x
+    (by transport_group ϕ.symm) with | _ hj <;>
   [use 1 ; use ϕ i ; use ϕ j ; use ϕ (i * j)]
   all_goals
     apply centralize_of_comm_generators ϕ
@@ -1064,7 +1071,7 @@ set_option linter.unusedVariables false in
 theorem isHamiltonian_characterisation (G : Type u) [Group G] :
   IsHamiltonian G ↔
   ∃ (E : ModuleCat.{u} (ZMod 2))
-    (T : CommGrp.{u}) (hT : ∀ x : T, Odd (orderOf x)),
+    (T : CommGrpCat.{u}) (hT : ∀ x : T, Odd (orderOf x)),
     Nonempty (G ≃* Q₈ × (Multiplicative E) × T) where
   mp := by
     intro hG

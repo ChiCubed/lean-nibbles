@@ -137,7 +137,7 @@ theorem wah
       refine rolls_unif i |>.aemeasurable ?_ ?_ |>.nullMeasurable (by simp) <;> simp [six]
     rw [lintegral_eq_tsum_meas_le _ f_mble]
     simp_rw [this]
-    rw [tsum_pnat_eq_tsum_succ (fun k => 1 / 2 ^ k)]
+    rw [tsum_pnat_eq_tsum_succ (f := fun k => 1 / 2 ^ k)]
     simp_rw [one_div, ENNReal.inv_pow, ENNReal.tsum_geometric_add_one]
     simp only [ENNReal.one_sub_inv_two, inv_inv]
     apply ENNReal.inv_mul_cancel <;> norm_num

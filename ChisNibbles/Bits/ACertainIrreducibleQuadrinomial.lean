@@ -143,8 +143,8 @@ variable (d : Data)
 noncomputable def p : ℤ[X] := X ^ d.n + X ^ d.m + X + 1
 
 lemma p_ix_nodup : [0, 1, d.m, d.n].Nodup :=
-  List.Pairwise.nodup <| List.chain'_iff_pairwise.mp <|
-    show List.Chain' (· < ·) _ by simp [d.h_n_m, d.h_m_1]
+  List.Pairwise.nodup <| List.isChain_iff_pairwise.mp <|
+    show List.IsChain (· < ·) _ by simp [d.h_n_m, d.h_m_1]
 
 lemma p_ix_toFinset : [0, 1, d.m, d.n].toFinset = {0, 1, d.m, d.n} := by
   simp
@@ -199,8 +199,8 @@ theorem mirror_p_eq : d.p.mirror = X ^ d.n + X ^ (d.n - 1) + X ^ (d.n - d.m) + 1
   rw [mirror_p_eq']
   -- i could deduce this from the other stuff but whatever
   have nodup : [0, d.n - d.m, d.n - 1, d.n].Nodup :=
-    List.Pairwise.nodup <| List.chain'_iff_pairwise.mp <|
-      show List.Chain' (· < ·) _ by have := d.h_n_m; have := d.h_m_1; simp; omega
+    List.Pairwise.nodup <| List.isChain_iff_pairwise.mp <|
+      show List.IsChain (· < ·) _ by have := d.h_n_m; have := d.h_m_1; simp; omega
   have toFinset : [0, d.n - d.m, d.n - 1, d.n].toFinset = {0, d.n - d.m, d.n - 1, d.n} := by
     simp
   rw [← sum_X_pow_finset_eq_ofFinsupp_indicator, ← toFinset, List.sum_toFinset _ nodup]
@@ -467,8 +467,8 @@ namespace main₁
         trunc (d.k + 1) (s.q * s.q.mirror) = ofFinsupp (.indicator {0, 1, d.k} (fun _ _ => 1)) := by
       rw [← s.hq, p_mul_mirror_low]
       have nodup : [0, 1, d.k].Nodup :=
-        List.Pairwise.nodup <| List.chain'_iff_pairwise.mp <|
-          show List.Chain' (· < ·) _ by simp [d.one_lt_k]
+        List.Pairwise.nodup <| List.isChain_iff_pairwise.mp <|
+          show List.IsChain (· < ·) _ by simp [d.one_lt_k]
       have toFinset : [0, 1, d.k].toFinset = {0, 1, d.k} := by
         simp
       convert_to ([0, 1, d.k].map (X ^ ·)).sum = (_ : ℤ[X])
@@ -610,8 +610,8 @@ namespace main₁
         clear * - a_lo a_hi this
         set ix : Finset ℕ := {0, 1, a, d.n}
         have nodup : [0, 1, a, d.n].Nodup :=
-          List.Pairwise.nodup <| List.chain'_iff_pairwise.mp <|
-            show List.Chain' (· < ·) _ by simp [a_lo, a_hi]
+          List.Pairwise.nodup <| List.isChain_iff_pairwise.mp <|
+            show List.IsChain (· < ·) _ by simp [a_lo, a_hi]
         have finset : [0, 1, a, d.n].toFinset = ix := by
           simp [ix]
         convert_to s.q = ([0, 1, a, d.n].map (X ^ ·)).sum

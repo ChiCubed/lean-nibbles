@@ -37,7 +37,7 @@ theorem flippysum (n : ℕ) (hn : n ≥ 2) :
     intro i hi
     apply Nat.log_le_self
   rw [sum_congr rfl fun j hj => congrArg card <| filter_congr fun x hx =>
-    .symm <| Nat.pow_le_iff_le_log (by have := mem_Icc.mp hx; omega) (by omega)]
+    Nat.le_log_iff_pow_le (by have := mem_Icc.mp hx; omega) (by omega)]
 
   have h₀ (j : ℕ) (hj : 1 ≤ j) :
       card (filter (· ^ j ≤ n) (Icc 1 n)) = ⌊(n : ℝ) ^ (1 / j : ℝ)⌋₊ := by

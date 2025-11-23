@@ -54,7 +54,11 @@ example (n : ℕ) (hn : 4 ≤ n) :
   qify
   suffices : (1 + 1 / n : ℚ) ^ n < n ^ 2 / (n + 1)
   . rw [← div_lt_div_iff_of_pos_right (c := (n ^ n * (n + 1) : ℚ)) (by positivity)]
-    convert this using 1 <;> field_simp <;> ring
+    convert this using 1
+    focus
+      field_simp
+      rw [div_pow]
+    all_goals field
   have hn' : (n - 1 : ℚ) < n ^ 2 / (n + 1)
   . rw [lt_div_iff₀ (by positivity)]; nlinarith
   apply (free_e n).trans_le ?_ |>.trans hn'

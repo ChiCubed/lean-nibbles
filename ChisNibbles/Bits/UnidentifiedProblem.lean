@@ -22,7 +22,8 @@ theorem thingy
       this.trans_eq <| mul_comm _ _
     qify at this
     field_simp
-    simpa (discharger := positivity) [div_le_div_iff₀]
+    push_cast
+    linear_combination this
   induction n with
   | zero =>
     simp [h₀]

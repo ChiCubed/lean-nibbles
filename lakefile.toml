@@ -1,0 +1,12 @@
+name = "chis-nibbles"
+defaultTargets = ["ChisNibbles"]
+
+[leanOptions]
+autoImplicit = false
+
+[[require]]
+name = "mathlib"
+scope = "leanprover-community"
+
+[[lean_lib]]
+name = "ChisNibbles"

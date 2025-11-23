@@ -25,6 +25,7 @@ that seems to repeatedly bluescreen my laptop
 section trace_pow_expChar
   variable {R : Type*} [CommRing R] (n : ℕ) [ExpChar R n]
 
+  -- TODO charpoly_map
   open Polynomial in
   lemma Matrix.charpoly_pow_expChar
     {ι : Type*} [DecidableEq ι] [Fintype ι]
@@ -122,7 +123,7 @@ namespace Construction
 open Polynomial
 
 noncomputable section defs
-  def F₀ := RatFunc $ AlgebraicClosure (ZMod 2)
+  def F₀ := RatFunc <| AlgebraicClosure (ZMod 2)
   instance : Field F₀ := by unfold F₀; infer_instance
   instance : CharP F₀ 2 := Algebra.charP_iff (AlgebraicClosure (ZMod 2)) (RatFunc _) _
     |>.mp inferInstance
@@ -133,10 +134,10 @@ noncomputable section defs
   -- another choice for F which works is a maximal odd subextension of F₀
   def F' : ℕ → IntermediateField F₀ (AlgebraicClosure F₀)
     | 0 => ⊥
-    | n + 1 => .restrictScalars F₀ $ .adjoin (F' n) {x | ∃ p, Odd p ∧ p.Prime ∧ x ^ p ∈ F' n}
+    | n + 1 => .restrictScalars F₀ <| .adjoin (F' n) {x | ∃ p, Odd p ∧ p.Prime ∧ x ^ p ∈ F' n}
   def F := iSup F'
 
-  def E := AdjoinRoot (R := F) $ F₀.poly.map $ algebraMap F₀ F
+  def E := AdjoinRoot (R := F) <| F₀.poly.map <| algebraMap F₀ F
   -- proving E is a field will have to wait
 end defs
 
@@ -200,9 +201,9 @@ section first
       rw [this]
       simp_rw [← map_add, hb, map_zero]
     simp only [trace_algebraMap, nsmul_eq_mul]
-    obtain ⟨u, hu⟩ : Odd (minpoly F x).natDegree := p_odd.of_dvd_nat $
+    obtain ⟨u, hu⟩ : Odd (minpoly F x).natDegree := p_odd.of_dvd_nat <|
       natDegree_adjoin_simple_of_no_new_roots h_roots hx
-    rw [adjoin.finrank (.of_pow hp.1.pos $ hx ▸ isIntegral_algebraMap), hu]
+    rw [adjoin.finrank (.of_pow hp.1.pos <| hx ▸ isIntegral_algebraMap), hu]
     simp [CharTwo.two_eq_zero]
 end first
 
@@ -219,7 +220,7 @@ private lemma AlgClosed_has_nth_roots
   replace ha : a ∈ p.aroots E := by
     suffices ¬ (X ^ n - C 1 : E[X]) = 0 by simpa [p, ha]
     apply Polynomial.X_pow_sub_C_ne_zero hn
-  have : p.aroots E = _ := Polynomial.roots_map (algebraMap F E) $ IsAlgClosed.splits p
+  have : p.aroots E = _ := Polynomial.roots_map (algebraMap F E) <| IsAlgClosed.splits p
   rw [this, Multiset.mem_map] at ha
   rcases ha with ⟨b, _, rfl⟩
   simp
@@ -281,7 +282,7 @@ lemma F₀.no_roots : ∀ x : F₀, not_a_root x := by
   replace hx : aeval x p = 0 := hx
   rw [hp, aeval_map_algebraMap] at hx
   obtain ⟨x, rfl⟩ := isInteger_of_is_root_of_monic p'_monic hx
-  apply isRoot_of_aeval_algebraMap_eq_zero (algebraMap_injective _) at hx
+  replace hx := isRoot_of_aeval_algebraMap_eq_zero hx
   apply no_roots.aux x; simpa [p'] using hx
 
 lemma F'.no_roots.base : ∀ x ∈ F' 0, not_a_root x := by
@@ -312,7 +313,7 @@ lemma F'.no_roots n : ∀ x ∈ F' n, not_a_root x := by
     haveI : Fact p.Prime := ⟨hp⟩
     simp_rw [mem_restrictScalars]
     contrapose! ihK with hKa
-    simp_rw [ne_eq, not_not, show (F₀.T : AlgebraicClosure F₀) = ((F₀.T : F' n) : K) by simp] at hKa ⊢
+    simp_rw [show (F₀.T : AlgebraicClosure F₀) = ((F₀.T : F' n) : K) by simp] at hKa ⊢
     generalize hr : a ^ p = r
     lift r to F' n using hr ▸ ha
     replace hr : a ^ p = (r : K) := by exact_mod_cast hr
@@ -430,9 +431,9 @@ lemma F.odd_prime_radically_closed
 
   apply congrArg f at hy
   rw [map_pow] at hy
-  have almost := odd_prime_radically_closed.aux p_odd hp (x := f x') $ by
+  have almost := odd_prime_radically_closed.aux p_odd hp (x := f x') <| by
     rw [← hy, f_map_mem_iff]
-    simp only [RingHom.mem_range, algebraMap.coe_inj, exists_eq]
+    exists y
   rw [f_map_mem_iff] at almost
   convert almost
 
@@ -448,11 +449,11 @@ instance : IsScalarTower F₀ F E := .of_algebraMap_eq fun _ => rfl
 instance : CharP E 2 := by rw [← Algebra.charP_iff F E]; infer_instance
 
 noncomputable abbrev E.power_basis : PowerBasis F E :=
-  AdjoinRoot.powerBasis $ by simp [← degree_eq_bot, F₀.poly_deg]
+  AdjoinRoot.powerBasis <| by simp [← degree_eq_bot, F₀.poly_deg]
 
 lemma E.pb_dim : E.power_basis.dim = 2 := by
   rw [AdjoinRoot.powerBasis_dim, natDegree_map]
-  apply natDegree_eq_of_degree_eq_some $ F₀.poly_deg
+  apply natDegree_eq_of_degree_eq_some <| F₀.poly_deg
 
 theorem E.no_new_radicals
   {n : ℕ} (hn : 0 < n)

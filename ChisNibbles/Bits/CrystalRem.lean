@@ -21,12 +21,9 @@ theorem crystalrem (n : ℕ) : ¬ n.sqrt ^ 2 + 2 ∣ n ^ 2 + 1 := by
       rw [Nat.dvd_prime (by norm_num)] at h
     . replace h : n.sqrt ^ 2 = 3 := by simpa using h
       absurd h ▸ IsSquare.sq n.sqrt
-      -- wtf, apparently in current Lean "decide" can't prove ¬ IsSquare 3.
-      -- I think it gets stuck on computing Nat.sqrt 3? anyway, :(
+      -- still wish i could just decide this, like back in the day...
       simp_rw [IsSquare, eq_comm, Nat.exists_mul_self]
-      -- this is so rip
-      have bob : Nat.sqrt 3 = 1 := by simp [Nat.sqrt, Nat.sqrt.iter]
-      rw [bob]; decide
+      norm_num
     . absurd s_pos.ne'
       simpa using h
   rcases h with ⟨m, h⟩

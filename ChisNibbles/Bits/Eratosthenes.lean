@@ -4,6 +4,7 @@ import Mathlib
 a verified imperative sieve of eratosthenes using `mvcgen` and `grind`! :O
 -/
 
+/-
 macro_rules
   | `([ $start : $stop : $step ]) => `({ start := $start, stop := $stop, step := $step, step_pos := by grind : Std.Range })
   | `([ : $stop : $step ]) => `({ stop := $stop, step := $step, step_pos := by grind : Std.Range })
@@ -54,13 +55,13 @@ theorem Std.Range.mem_iff_dvd (x : Nat) (r : Range) :
   apply exists_eq_mul_right_of_dvd at hd
   obtain ⟨x, rfl⟩ := hd
   rw [← Nat.lt_sub_iff_add_lt', ← Nat.lt_sub_iff_add_lt', add_tsub_cancel_left,
-    mul_lt_mul_left r.step_pos, lt_iff_not_ge (a := x), ceilDiv_le_iff_le_mul r.step_pos, ← lt_iff_not_ge]
+    Nat.mul_lt_mul_left r.step_pos, lt_iff_not_ge (a := x), ceilDiv_le_iff_le_mul r.step_pos, ← lt_iff_not_ge]
 
 @[grind →] theorem List.pref_of_range'_eq_append_cons {s n step xs cur ys} (h : range' s n step = xs ++ cur :: ys) :
     xs = range' s xs.length step := by
   grind only [range'_eq_append_iff, = length_range']
 
-attribute [local grind] Nat.minFac_prime Nat.prime_def_minFac Nat.minFac_dvd Nat.minFac_le in
+attribute [local grind! .] Nat.minFac_prime Nat.prime_def_minFac Nat.minFac_dvd Nat.minFac_le in
 attribute [local grind →] Nat.Prime.two_le in
 open Std.Do in
 @[spec] theorem primesLt.spec n :
@@ -73,7 +74,7 @@ open Std.Do in
           i ∈ pos.prefix ∧ i.Prime ∨
           2 ≤ i ∧ i.minFac ∉ pos.prefix) ∧
        primes.toList = pos.prefix.filter (·.Prime)⌝
-  case inv2 =>
+  case inv2 pref _ _ _ _ _ _ _ _ _ =>
     refine (?_, ())
     exact fun (pos, prime?) =>
       ⌜∀ i (hi : i < n), prime?[i] ↔
@@ -91,3 +92,5 @@ open Std.Do in
   case vc4.step.isFalse => grind [=> List.mem_append_left]
   case vc5.pre => grind
   case vc6.post.success => grind [=_ Array.mem_toList_iff, List.sorted_le_range', List.Sorted.filter]
+
+-/

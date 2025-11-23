@@ -18,10 +18,10 @@ proof by left inverse
 namespace Proof1
   attribute [local simp] toList
 
-  @[local simp, local grind] theorem toList_ne_nil {d t} : toList d t ≠ [] := by
+  @[local simp, local grind .] theorem toList_ne_nil {d t} : toList d t ≠ [] := by
     fun_induction toList <;> simp_all
 
-  @[local grind] theorem head_toList_ge {d t} : d ≤ (toList d t).head toList_ne_nil := by
+  @[local grind .] theorem head_toList_ge {d t} : d ≤ (toList d t).head toList_ne_nil := by
     fun_induction toList <;> (simp_all <;> omega)
 
   -- this def still makes me a bit saD :( i wan smoething
@@ -43,7 +43,7 @@ namespace Proof1
         (.leaf, [])
   termination_by (as.length, as.headI - d)
 
-  @[local grind] theorem length_ofList_lt {d l} : (ofList d l).2.length ≤ l.length - 1 := by
+  @[local grind .] theorem length_ofList_lt {d l} : (ofList d l).2.length ≤ l.length - 1 := by
     induction hl : l.length using Nat.strong_induction_on generalizing d l; grind [ofList]
 
   theorem ofList_toList {d l t} : ofList d (toList d t ++ l) = (t, l) := by
@@ -75,7 +75,7 @@ namespace Proof2
       rw [toList, toList, List.append_eq_append_iff] at h
       rcases h with ⟨l, h₁, h₂⟩ | ⟨l, h₁, h₂⟩
       all_goals
-        have : (l |>.map ((2⁻¹ : ℚ) ^ ·)).sum = 0 := by grind [toList_invar, List.sum_append]
+        have : (l |>.map ((2⁻¹ : ℚ) ^ ·)).sum = 0 := by grind [toList_invar]
         apply List.all_zero_of_le_zero_le_of_sum_eq_zero (by simp) at this
         obtain rfl : l = [] := List.eq_nil_iff_forall_not_mem.mpr <| by simpa
         simp_all; solve_by_elim [toList_injective]
@@ -89,16 +89,16 @@ proof by being smart
 namespace Proof3
   attribute [local simp, local grind] toList
 
-  @[local simp, local grind] theorem toList_ne_nil {d t} : toList d t ≠ [] := by
+  @[local simp, local grind .] theorem toList_ne_nil {d t} : toList d t ≠ [] := by
     fun_induction toList <;> simp_all
 
-  @[local grind] theorem head_toList_ge {d t} : d ≤ (toList d t).head toList_ne_nil := by
+  @[local grind! .] theorem head_toList_ge {d t} : d ≤ (toList d t).head toList_ne_nil := by
     fun_induction toList <;> (simp_all <;> omega)
 
   theorem toList_injective.aux {n t t' l l'} (h : toList n t ++ l = toList n t' ++ l') :
       t = t' ∧ l = l' := by
     match t, t' with
-    | .leaf, .leaf | .leaf, .branch .. | .branch .., .leaf => grind [=> List.head_append_left]
+    | .leaf, .leaf | .leaf, .branch .. | .branch .., .leaf => grind [! => List.head_append_left]
     | .branch .., .branch .. =>
       simp only [toList, List.append_assoc] at h
       have ⟨rfl, h⟩ := aux h

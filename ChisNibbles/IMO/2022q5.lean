@@ -38,16 +38,14 @@ lemma desc_fac_bound : ∀ n r : ℕ,
 -- ...having to add a space between n and ! is less convenient.
 -- you win some you lose some i guess.
 lemma fac_bound (n : ℕ) : n ! ≤ (n/2 + 1) ^ n := by
-  cases' n with n
-  case zero => norm_num
+  cases n with | zero => norm_num | succ n =>
   convert desc_fac_bound (n+1) n using 1
   . simp [descFactorial_eq_div]
   . congr; omega
 
 lemma weak_fac_bound (n : ℕ) : n ! ≤ n ^ n := by
-  cases' n with n
-  case zero => norm_num
-  apply fac_bound (n+1) |>.trans
+  cases n with | zero => norm_num | succ n =>
+  grw [fac_bound (n+1)]
   gcongr; omega
 
 lemma pow_add_lt_aux (a : ℕ) : ∀ n : ℕ,
@@ -200,8 +198,7 @@ theorem q5 (a b p : ℕ) :
       _       < p * (p ^ o)       := ?_
       _       = p ^ p             := by rw [← Nat.pow_succ']
     gcongr
-    case' bc => apply pow_add_lt
-    all_goals omega
+    apply pow_add_lt <;> omega
 
   replace b_lo : p < b := by omega
   clear b_ne
@@ -215,8 +212,8 @@ theorem q5 (a b p : ℕ) :
     -- it's also possible to just whack these goals:
     -- case sorted | prod_eq => simp; omega
     case sorted =>
-      simp only [List.Sorted, ← List.chain'_iff_pairwise,
-        List.chain'_cons_cons, List.chain'_singleton, and_true]
+      simp only [List.Sorted, ← List.isChain_iff_pairwise,
+        List.isChain_cons_cons, List.isChain_singleton, and_true]
       omega
     case prod_eq =>
       simp only [mem_mk, Multiset.mem_coe, List.mem_cons,

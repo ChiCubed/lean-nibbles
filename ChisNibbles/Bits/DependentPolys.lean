@@ -308,7 +308,7 @@ theorem MvPolynomial.finrank_restrictTotalDegree
     apply Equiv.setCongr
     ext n; dsimp
     show _ ↔ n ∈ s
-    simp only [disjiUnion_eq_biUnion, mem_biUnion, mem_range, Nat.lt_succ, mem_finsuppAntidiag',
+    simp only [disjiUnion_eq_biUnion, mem_biUnion, mem_range, Nat.lt_succ_iff, mem_finsuppAntidiag',
       subset_univ, and_true, exists_eq_right', s]
   rw [Module.finrank_eq_card_finset_basis b]
   rw [card_disjiUnion]
@@ -374,7 +374,7 @@ theorem dependent_polys
   -- d is a strict upper bound on the degrees
   let d := Finset.univ.image (totalDegree ∘ p) |>.max' (by simp) |>.succ
   have d_pos : 0 < d := by simp [d]
-  have hd {i} : (p i).totalDegree < d := by simp [d, Nat.lt_succ, Finset.le_max']
+  have hd {i} : (p i).totalDegree < d := by simp [d, Nat.lt_succ_iff, Finset.le_max']
   clear_value d
 
   let f k : restrictTotalDegree (Fin (n + 1)) R (k / d) →ₗ[R] restrictTotalDegree (Fin n) R k :=

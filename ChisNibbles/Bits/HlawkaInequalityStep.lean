@@ -19,6 +19,5 @@ theorem the (a b c : ℂ) :
   . rw [← sub_eq_zero] at this ⊢
     rw [← this]
     ring
-  simp_rw [← inner_self_eq_norm_sq (𝕜 := ℂ)]
-  simp
+  simp_rw [← real_inner_self_eq_norm_sq, inner_add_left, inner_add_right]
   ring

@@ -627,7 +627,7 @@ theorem zero_not_mem_segment_iff {V}
 def aux.e : (ℝ × ℝ) ≃L[ℝ] EuclideanSpace ℝ (Fin 2) :=
   .symm <| (EuclideanSpace.equiv (Fin 2) ℝ).trans (ContinuousLinearEquiv.finTwoArrow ℝ ℝ)
 
-@[simp] theorem aux.e_apply_mk x y : e (x, y) = ![x, y] := rfl
+@[simp] theorem aux.e_apply_mk x y : e (x, y) = !₂[x, y] := rfl
 
 -- TODO move this
 @[simp] theorem EuclideanSpace.real_inner_two_apply (x y : EuclideanSpace ℝ (Fin 2)) :
@@ -636,11 +636,11 @@ def aux.e : (ℝ × ℝ) ≃L[ℝ] EuclideanSpace ℝ (Fin 2) :=
   simp [EuclideanSpace.inner_eq_star_dotProduct]; ring
 
 @[simp] theorem EuclideanSpace.real_inner_two_apply_mk (a b c d : ℝ) :
-    @inner ℝ (EuclideanSpace ℝ (Fin 2)) _ ![a, b] ![c, d] = a * c + b * d := by
+    @inner ℝ (EuclideanSpace ℝ (Fin 2)) _ !₂[a, b] !₂[c, d] = a * c + b * d := by
   simp
 
 @[simp] theorem vec_two_ext {α} {a b c d : α} :
-    ![a, b] = ![c, d] ↔ a = c ∧ b = d := by
+    !₂[a, b] = !₂[c, d] ↔ a = c ∧ b = d := by
   simp [Matrix.vecCons]
 
 
@@ -680,7 +680,7 @@ theorem aux.homotopy_l_injective_zero : ∀ t, Function.Injective (aux.homotopy_
       (try norm_num1 at h₁ h₂) <;> linarith
 
   by_cases hy : (y : ℝ) ≤ 1/2 <;>
-    [ exists ![0, 1]; exists ![1, 0] ] <;>
+    [ exists !₂[0, 1]; exists !₂[1, 0] ] <;>
     constructor
   case pos.right | neg.right =>
     split_ifs <;> try (exfalso; linarith)
@@ -714,7 +714,7 @@ theorem aux.homotopy_i_injective_zero : ∀ t, Function.Injective (aux.homotopy_
       apply mt vec_two_ext.mp
       rintro ⟨h₁, h₂⟩
       (try norm_num1 at h₁ h₂) <;> linarith
-  exists ![1, 0]
+  exists !₂[1, 0]
   constructor
   case right =>
     simp_rw [map_sub, squareCoe_mk, e_apply_mk, inner_sub_left, EuclideanSpace.real_inner_two_apply_mk]

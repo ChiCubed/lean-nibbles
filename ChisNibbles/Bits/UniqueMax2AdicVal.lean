@@ -16,7 +16,7 @@ theorem padicValNat.val_2_lt_add_of_eq
     padicValNat 2 a < padicValNat 2 (a + b) := by
   have hab : 0 < a + b := by positivity
   rw [← PartENat.coe_lt_coe]
-  apply congrArg (Nat.cast (R := PartENat)) at h
+  apply congrArg (Nat.cast (R := ENat)) at h
   simp_all only [add_pos_iff, or_self, padicValNat_eq_maxPowDiv, one_lt_two, ne_eq, ne_of_gt,
     not_false_eq_true, Nat.finiteMultiplicity_iff, and_true, maxPowDiv_eq_multiplicity,
     Nat.cast_inj, Nat.cast_lt]
@@ -57,5 +57,6 @@ example (m n : ℕ) (hm : 0 < m) (ho : m < n) :
           exact Nat.le_sub_one_of_lt hpz'
   simp_rw [← Finset.coe_Ico] at h
   contrapose! h
+  simp only [SetLike.mem_coe]
   apply Finset.exists_max_image
   simpa
