@@ -2,9 +2,6 @@ import Mathlib
 
 open Set Real
 
-
-
-namespace Short
 variable {r : ℝ} (hr : 1 < r)
 include hr
 
@@ -13,7 +10,9 @@ attribute [grind! .] mul_pos div_pos inv_pos sin_pos_of_mem_Ioo cos_pos_of_mem_I
 @[grind =, grind =_] lemma mul_lt_pi {x : ℝ} : x < π / r ↔ r * x < π := by rw [← lt_div_iff₀']; cutsat
 @[bound, grind! .] lemma sin_pos_r {x : ℝ} (hx : x ∈ Ioo 0 (π / r)) : 0 < sin (r * x) := by grind
 
-attribute [fun_prop]
+
+section Short
+attribute [local fun_prop]
   HasDerivAt
   hasDerivAt_id hasDerivAt_const HasDerivAt.comp HasDerivAt.prodMk
   HasDerivAt.add HasDerivAt.fun_add HasDerivAt.sub HasDerivAt.fun_sub
@@ -57,8 +56,9 @@ end Short
 
 
 
-namespace Long
-lemma Real.tan_strictConvexOn : StrictConvexOn ℝ (Ico 0 (π / 2)) tan := by
+section Long
+omit r hr in
+lemma _root_.Real.tan_strictConvexOn : StrictConvexOn ℝ (Ico 0 (π / 2)) tan := by
   apply strictConvexOn_of_deriv2_pos (convex_Ico ..) (continuousOn_tan_Ioo.mono (by grind))
   rw [interior_Ico]
   intro x hx
@@ -69,15 +69,6 @@ lemma Real.tan_strictConvexOn : StrictConvexOn ℝ (Ico 0 (π / 2)) tan := by
   norm_num; field_simp
   have : π / 2 < π := by bound
   grind [sin_pos_of_mem_Ioo]
-
-
-variable {r : ℝ} (hr : 1 < r)
-include hr
-
-@[bound, grind →] lemma pi_div_lt : π / r < π := by bound
-@[grind =, grind =_] lemma mul_lt_pi {x : ℝ} : x < π / r ↔ r * x < π := by rw [← lt_div_iff₀']; cutsat
-attribute [grind! .] mul_pos div_pos inv_pos sin_pos_of_mem_Ioo cos_pos_of_mem_Ioo tan_pos_of_pos_of_lt_pi_div_two
-@[bound, grind! .] lemma sin_pos_r {x : ℝ} (hx : x ∈ Ioo 0 (π / r)) : 0 < sin (r * x) := by grind
 
 theorem bob : StrictMonoOn (fun x => sin x / sin (r * x)) (Ico 0 (π / r)) := by
   -- It suffices that log ∘ f is strictly increasing on (0, π/r)
