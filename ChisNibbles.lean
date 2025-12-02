@@ -15,6 +15,7 @@ import ChisNibbles.Bits.RealsUncountable
 import ChisNibbles.Bits.RollTheDice
 import ChisNibbles.Bits.SequenceReversalThing
 import ChisNibbles.Bits.SomePowerBound
+import ChisNibbles.Bits.SortaLogSinExpConcavity
 import ChisNibbles.Bits.UnidentifiedProblem
 import ChisNibbles.Bits.UniqueMax2AdicVal
 import ChisNibbles.Bits.YouGottaAdmit
