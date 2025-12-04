@@ -10,6 +10,7 @@ import ChisNibbles.Bits.FlippySum
 import ChisNibbles.Bits.HlawkaInequalityStep
 import ChisNibbles.Bits.IMOSL2021C1
 import ChisNibbles.Bits.KindaGCDPreserver
+import ChisNibbles.Bits.LatticePoly
 import ChisNibbles.Bits.OppositeFLT
 import ChisNibbles.Bits.RealsUncountable
 import ChisNibbles.Bits.RollTheDice
