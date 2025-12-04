@@ -9,6 +9,7 @@ import ChisNibbles.Bits.Eratosthenes
 import ChisNibbles.Bits.FlippySum
 import ChisNibbles.Bits.HlawkaInequalityStep
 import ChisNibbles.Bits.IMOSL2021C1
+import ChisNibbles.Bits.IranTST2025q9
 import ChisNibbles.Bits.KindaGCDPreserver
 import ChisNibbles.Bits.LatticePoly
 import ChisNibbles.Bits.OppositeFLT
