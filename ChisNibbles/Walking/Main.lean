@@ -10,7 +10,7 @@ def IsWalkable {α} (s e : α → EuclideanSpace ℝ (Fin 2)) :=
 
 namespace IsWalkable
 
-instance instIsSymm {α} : IsSymm (α → EuclideanSpace ℝ (Fin 2)) IsWalkable where
+instance instSymm {α} : Std.Symm (IsWalkable (α := α)) where
   symm _ _ := fun ⟨p, h⟩ => ⟨Path.symm ∘' p, h ∘' unitInterval.symm⟩
 
 def symm {α s e} (h : @IsWalkable α s e) : IsWalkable e s :=

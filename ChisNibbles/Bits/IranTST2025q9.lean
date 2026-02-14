@@ -233,12 +233,12 @@ theorem self i : IsApprox (a i) i := by simpa using a.h i i
 theorem coprime i j (h : Coprime i j) : Coprime (a i) (a j) := by
   have := a.h i j
   dsimp only [Coprime, IsApprox] at *
-  pnat_to_nat; cutsat
+  pnat_to_nat; lia
 theorem one : a 1 = 1 := by simpa [Coprime] using a.coprime 1 1 coprime_one
 theorem one_lt i (hi : 1 < i) : 1 < a i := by
   have := a.self i
   unfold IsApprox at this
-  pnat_to_nat; cutsat
+  pnat_to_nat; lia
 
 theorem dvd_six_mul {i j} (hij : i ∣ j) :
     a i ∣ 6 * a j := by
@@ -307,7 +307,7 @@ theorem q₀_injective : Function.Injective q₀ := fun i j h => by
 
 theorem q₀_le_of_four_le {p : ℙ} (hp : 4 ≤ (p : ℕ+)) : (q₀ p : ℕ+) ≤ p := by
   by_cases! hq₀ : (q₀ p : ℕ+) < 4
-  . pnat_to_nat; cutsat
+  . pnat_to_nat; lia
   have ⟨h2, h3⟩ : ⟨2, Nat.prime_two⟩ ∉ Q p ∧ ⟨3, Nat.prime_three⟩ ∉ Q p := by
     constructor; all_goals
     apply mt <| hq₀.trans ∘ a.q₀_le_of_mem
@@ -483,9 +483,9 @@ theorem hi x : (f x).1 ≤ f₁ x.1 + C p' q' ∧ (f x).2 ≤ f₂ x.2 + C p' q'
   have hf := self.h_self x |>.1
   constructor <;> by_contra! h
   . have := ht_lemma₁ p' q' (f₁ x.1) (f₂ x.2) |>.trans <| ht_mono p' q' (b := f x) ⟨h.le, self.lo₂ x⟩
-    pnat_to_nat; cutsat
+    pnat_to_nat; lia
   . have := ht_lemma₂ p' q' (f₁ x.1) (f₂ x.2) |>.trans <| ht_mono p' q' (b := f x) ⟨self.lo₁ x, h.le⟩
-    pnat_to_nat; cutsat
+    pnat_to_nat; lia
 
 theorem inc.step₁ i j (hj : j ≤ 1) : f₁ i + j ≤ f₁ (i + j + 1) := by
   by_contra! h
@@ -513,7 +513,7 @@ theorem inc i j (hij : i < j) : f₁ i + (j - i) / 2 ≤ f₁ j ∧ f₂ i + (j 
   induction k using Nat.twoStepInduction with
   | zero => simpa using inc.step self i 0 (by simp)
   | one => simpa using inc.step self i 1 (by simp)
-  | more k ih₁ ih₂ => have := inc.step self (i + 1 + k) 1 (by simp); cutsat
+  | more k ih₁ ih₂ => have := inc.step self (i + 1 + k) 1 (by simp); lia
 
 def buffer := 2 * (hi.C p' q' + 1)
 

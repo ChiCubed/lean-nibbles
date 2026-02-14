@@ -74,8 +74,8 @@ lemma prod_dvd_fac_of_le (n : ℕ) (s : Finset ℕ) (h : ∀ x ∈ s, 0 < x ∧ 
     have ⟨l, r⟩ := h x hx; mem_Ico.mpr ⟨l, lt_succ_of_le r⟩
 
 abbrev sorted_to_finset
-  {α : Type*} {r : α → α → Prop} [IsIrrefl α r]
-  (l : List α) (h : l.Sorted r) :
+  {α : Type*} {r : α → α → Prop} [Std.Irrefl r]
+  (l : List α) (h : l.Pairwise r) :
     Finset α :=
   ⟨l, h.nodup⟩
 
@@ -212,8 +212,8 @@ theorem q5 (a b p : ℕ) :
     -- it's also possible to just whack these goals:
     -- case sorted | prod_eq => simp; omega
     case sorted =>
-      simp only [List.Sorted, ← List.isChain_iff_pairwise,
-        List.isChain_cons_cons, List.isChain_singleton, and_true]
+      simp only [← List.isChain_iff_pairwise, List.isChain_cons_cons,
+        List.isChain_singleton, and_true]
       omega
     case prod_eq =>
       simp only [mem_mk, Multiset.mem_coe, List.mem_cons,

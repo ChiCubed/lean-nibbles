@@ -59,7 +59,6 @@ instance {k} : Unique (UpTo 0 k) where
   uniq a := by
     suffices a.parts = ∅ by ext : 1; simpa
     by_contra! ha
-    rw [← nonempty_iff_ne_empty] at ha
     suffices 0 < ∑ p ∈ a.parts, p ^ 3 by simpa [a.sum_parts]
     apply sum_pos _ ha
     exact fun i hi => Nat.pow_pos (a.parts_bdd i hi).1

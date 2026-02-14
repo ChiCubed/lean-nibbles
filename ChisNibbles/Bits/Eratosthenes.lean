@@ -5,8 +5,8 @@ a verified imperative sieve of eratosthenes using `mvcgen` and `grind`! :O
 -/
 
 macro_rules
-  | `([ $start : $stop : $step ]) => `({ start := $start, stop := $stop, step := $step, step_pos := by grind : Std.Range })
-  | `([ : $stop : $step ]) => `({ stop := $stop, step := $step, step_pos := by grind : Std.Range })
+  | `([ $start : $stop : $step ]) => `({ start := $start, stop := $stop, step := $step, step_pos := by grind : Std.Legacy.Range })
+  | `([ : $stop : $step ]) => `({ stop := $stop, step := $step, step_pos := by grind : Std.Legacy.Range })
 
 attribute [grind →] Membership.mem.lower Membership.mem.upper Membership.mem.step
 
@@ -37,11 +37,11 @@ section BoringLemmas
     exists m
     simpa [h] using hu
 
-  theorem Std.Range.mem_iff_dvd (x : Nat) (r : Range) :
+  theorem Std.Legacy.Range.mem_iff_dvd (x : Nat) (r : Range) :
       x ∈ r ↔ r.start ≤ x ∧ x < r.stop ∧ r.step ∣ x - r.start := by
     simp [instMembershipNatRange, ← Nat.dvd_iff_mod_eq_zero]
 
-  @[simp, grind _=_] theorem Std.Range.mem_toList_iff (x : Nat) (r : Range) :
+  @[simp, grind _=_] theorem Std.Legacy.Range.mem_toList_iff (x : Nat) (r : Range) :
       x ∈ r.toList ↔ x ∈ r := by
     refine ⟨mem_of_mem_range', ?_⟩
     rw [List.mem_range'_pos r.step_pos, mem_iff_dvd, ← Nat.ceilDiv_eq_add_pred_div]
@@ -63,14 +63,14 @@ end BoringLemmas
 
 
 @[simp, grind =] lemma primesLt.spec.aux {i p n : ℕ} (hp : 0 < p) : i ∈ [p*p:n:p] ↔ p * p ≤ i ∧ i < n ∧ p ∣ i := by
-  simp +contextual [Std.instMembershipNatRange, ← Nat.dvd_iff_mod_eq_zero, Nat.dvd_sub_iff_left]
+  simp +contextual [Std.Legacy.instMembershipNatRange, ← Nat.dvd_iff_mod_eq_zero, Nat.dvd_sub_iff_left]
 
 open Std.Do in
 attribute [local grind! .] Nat.minFac_prime Nat.prime_def_minFac Nat.minFac_dvd Nat.minFac_le in -- TOOD this stuff sdumb
 attribute [local grind →] Nat.Prime.two_le in
 set_option maxHeartbeats 10000000 in
 @[spec] theorem primesLt.spec n :
-    ⦃⌜True⌝⦄ primesLt n ⦃⇓r => ⌜(∀ p, p ∈ r ↔ p < n ∧ p.Prime) ∧ r.toList.Sorted (· ≤ ·)⌝⦄ := by
+    ⦃⌜True⌝⦄ primesLt n ⦃⇓r => ⌜(∀ p, p ∈ r ↔ p < n ∧ p.Prime) ∧ r.toList.SortedLE⌝⦄ := by
   mvcgen [primesLt]
   invariants
   | inv1 =>
@@ -96,4 +96,4 @@ set_option maxHeartbeats 10000000 in
     grind (splits := 15) [Nat.minFac_sq_le_self, Nat.pow_two, → Nat.minFac_le_of_dvd, =_ Nat.lt_mul_self_iff]
   case vc4.step.isFalse => grind [=> List.mem_append_left]
   case vc5.pre => grind
-  case vc6.post.success => grind [=_ Array.mem_toList_iff, List.sorted_le_range', List.Sorted.filter]
+  case vc6.post.success => grind [=_ Array.mem_toList_iff, List.sortedLT_range']

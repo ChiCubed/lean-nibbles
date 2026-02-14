@@ -52,7 +52,7 @@ theorem woo (n : ℕ) (a u v : ℕ → ℤ)
   erw [rec_matrix us, rec_matrix vs, u0, v0]
   let B : Matrix _ _ ℤ := !![1, 1; 1, 0]
   let B' : Matrix _ _ ℤ := !![0, 1; 1, -1]
-  let B_inv : Invertible B := B.invertibleOfLeftInverse B' (by decide)
+  let B_inv : Invertible B := invertibleOfLeftInverse B B' (by decide)
   calc
     _ = _ᵀ                                                :=
       transpose_1x1 _ |>.symm

@@ -36,7 +36,7 @@ section trace_pow_expChar
     unfold charpoly charmatrix
     simp_rw [map_pow, RingHom.mapMatrix_apply]
     rw [← expand_inj hn,
-      ← map_expand, expand_char, expand_eq_comp_X_pow, comp_eq_aeval,
+      ← map_expand, map_frobenius_expand, expand_eq_comp_X_pow, comp_eq_aeval,
       ← det_pow, AlgHom.map_det]
     congr
     simp_rw [map_sub, map_pow, AlgHom.mapMatrix_apply, scalar_apply, map_map]
@@ -220,7 +220,7 @@ private lemma AlgClosed_has_nth_roots
   replace ha : a ∈ p.aroots E := by
     suffices ¬ (X ^ n - C 1 : E[X]) = 0 by simpa [p, ha]
     apply Polynomial.X_pow_sub_C_ne_zero hn
-  have : p.aroots E = _ := Polynomial.roots_map (algebraMap F E) <| IsAlgClosed.splits p
+  have : p.aroots E = _ := IsAlgClosed.splits p |>.roots_map _
   rw [this, Multiset.mem_map] at ha
   rcases ha with ⟨b, _, rfl⟩
   simp
@@ -282,6 +282,8 @@ lemma F₀.no_roots : ∀ x : F₀, not_a_root x := by
   replace hx : aeval x p = 0 := hx
   rw [hp, aeval_map_algebraMap] at hx
   obtain ⟨x, rfl⟩ := isInteger_of_is_root_of_monic p'_monic hx
+  -- needed to avoid timeout, for some reason
+  have _ : FaithfulSMul F[X] (RatFunc F) := IsFractionRing.instFaithfulSMul ..
   replace hx := isRoot_of_aeval_algebraMap_eq_zero hx
   apply no_roots.aux x; simpa [p'] using hx
 

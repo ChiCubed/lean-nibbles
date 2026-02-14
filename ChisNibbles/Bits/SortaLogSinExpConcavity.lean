@@ -7,7 +7,7 @@ include hr
 
 attribute [grind! .] mul_pos div_pos inv_pos sin_pos_of_mem_Ioo cos_pos_of_mem_Ioo tan_pos_of_pos_of_lt_pi_div_two
 @[bound, grind →] lemma pi_div_lt : π / r < π := by bound
-@[grind =, grind =_] lemma mul_lt_pi {x : ℝ} : x < π / r ↔ r * x < π := by rw [← lt_div_iff₀']; cutsat
+@[grind =, grind =_] lemma mul_lt_pi {x : ℝ} : x < π / r ↔ r * x < π := by rw [← lt_div_iff₀']; lia
 @[bound, grind! .] lemma sin_pos_r {x : ℝ} (hx : x ∈ Ioo 0 (π / r)) : 0 < sin (r * x) := by grind
 
 
@@ -23,14 +23,12 @@ theorem blob : StrictMonoOn (fun x => sin x / sin (r * x)) (Ico 0 (π / r)) := b
   rw [← Ioo_insert_left (by bound), strictMonoOn_insert_iff_of_forall_ge (by grind)]
   refine ⟨by simp [f]; grind, ?_⟩
 
-  -- due to some kind of fun_prop bug, disch := grind isn't working, so we do this instead
-  have : ∀ x ∈ Ioo 0 (π / r), sin (r * x) ≠ 0 := by grind
   let g x := cos x * sin (r * x) - r * sin x * cos (r * x)
   have hf' x (hx : x ∈ Ioo 0 (π / r) := by grind) : HasDerivAt f (g x / sin (r * x) ^ 2) x := by
     have : HasDerivAt f _ x
-    . fun_prop (disch := solve_by_elim)
+    . fun_prop (disch := grind)
     convert this using 1; ring
-  apply strictMonoOn_of_deriv_pos (convex_Ioo ..) (by fun_prop (disch := solve_by_elim))
+  apply strictMonoOn_of_deriv_pos (convex_Ioo ..) (by fun_prop (disch := grind))
   rw [interior_Ioo]
   intro x hx
   rw [hf' x |>.deriv]; clear * - hr hx
@@ -49,26 +47,25 @@ theorem blob : StrictMonoOn (fun x => sin x / sin (r * x)) (Ico 0 (π / r)) := b
   rw [hg' x |>.deriv]; clear * - hr hx
 
   have : 0 < r ^ 2 - 1 := by nlinarith
-  have : 0 < sin x := by grind
-  have : 0 < sin (r * x) := by grind
-  positivity
+  grind
 end Short
 
 
 
 section Long
+
 omit r hr in
 lemma _root_.Real.tan_strictConvexOn : StrictConvexOn ℝ (Ico 0 (π / 2)) tan := by
   apply strictConvexOn_of_deriv2_pos (convex_Ico ..) (continuousOn_tan_Ioo.mono (by grind))
   rw [interior_Ico]
   intro x hx
   simp_rw [Function.iterate_succ_apply, Function.iterate_zero_apply, funext deriv_tan, one_div]
-  have hc : 0 < cos x := by grind [cos_pos_of_mem_Ioo]
+  have hc : 0 < cos x := by grind only [mem_Ioo, cos_pos_of_mem_Ioo]
   rw [deriv_fun_inv'' (by fun_prop) (by simp; try bound)]
   simp only [differentiableAt_cos, deriv_fun_pow, deriv_cos']
   norm_num; field_simp
   have : π / 2 < π := by bound
-  grind [sin_pos_of_mem_Ioo]
+  grind only [mem_Ioo, sin_pos_of_mem_Ioo]
 
 theorem bob : StrictMonoOn (fun x => sin x / sin (r * x)) (Ico 0 (π / r)) := by
   -- It suffices that log ∘ f is strictly increasing on (0, π/r)
@@ -100,7 +97,7 @@ theorem bob : StrictMonoOn (fun x => sin x / sin (r * x)) (Ico 0 (π / r)) := by
 
   -- It suffices that x cot x is decreasing on (0, π)
   suffices r * x * cot (r * x) < x * cot x by
-    cases hx; linear_combination (norm := field_simp) x⁻¹ * this; cutsat
+    cases hx; linear_combination (norm := field_simp) x⁻¹ * this; lia
   suffices StrictAntiOn (fun x => x * cot x) (Ioo 0 π) from
     this (by grind) (by grind) (by cases hx; linear_combination x * hr)
   clear * -

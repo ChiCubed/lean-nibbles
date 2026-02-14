@@ -168,7 +168,7 @@ example
   wlog _ : IsReduced R
   . letI A := R ⧸ nilradical R
     have _ : IsReduced A := isRadical_iff_quotient_reduced _ |>.mp <| radical_isRadical _
-    have _ : Nontrivial A := Ideal.Quotient.nontrivial (by simp [nilradical, radical_eq_top])
+    have _ : Nontrivial A := Ideal.Quotient.nontrivial_iff.mpr <| by simp [nilradical, radical_eq_top]
     letI q : _ → MvPolynomial (Fin n) A := algebraMap _ _ ∘ p
     specialize this A _ q <| show AlgebraicIndependent A q by
       -- TODO kinda jank
@@ -180,7 +180,7 @@ example
       grw [nilradical, map_radical_le] at hf
       erw [Ideal.map_bot, mem_nilradical] at hf
       rcases hf with ⟨m, hf⟩
-      apply IsReduced.pow_eq_zero (n := m)
+      apply eq_zero_of_pow_eq_zero (n := m)
       rw [← map_pow] at hf ⊢
       convert RingHom.map_zero _
       exact hp _ hf
@@ -211,7 +211,7 @@ example
     apply this <;> infer_instance
 
   have e := IsArtinianRing.equivPi R
-  letI p' := (mapEquiv _ e |>.trans <| piEquiv _ _) ∘ p
+  letI p' := (mapEquiv _ e.toRingEquiv |>.trans <| piEquiv _ _) ∘ p
   have hp' : AlgebraicIndependent (∀ I : MaximalSpectrum R, R ⧸ I.asIdeal) p' :=
     (·.mpr hp) <| algebraicIndependent_ringHom_iff_of_comp_eq
       (f := e) (hg := RingEquiv.injective _) (h := by
@@ -374,7 +374,7 @@ theorem dependent_polys
   -- d is a strict upper bound on the degrees
   let d := Finset.univ.image (totalDegree ∘ p) |>.max' (by simp) |>.succ
   have d_pos : 0 < d := by simp [d]
-  have hd {i} : (p i).totalDegree < d := by simp [d, Nat.lt_succ_iff, Finset.le_max']
+  have hd {i} : (p i).totalDegree < d := by simp [d, Finset.le_max']
   clear_value d
 
   let f k : restrictTotalDegree (Fin (n + 1)) R (k / d) →ₗ[R] restrictTotalDegree (Fin n) R k :=
