@@ -3,6 +3,7 @@ import ChisNibbles.Bits.AdventOfProof.«2023».Q24
 import ChisNibbles.Bits.AMM.Q12582.Main
 import ChisNibbles.Bits.AnInequality
 import ChisNibbles.Bits.BMO2015q4
+import ChisNibbles.Bits.CATest
 import ChisNibbles.Bits.CrystalRem
 import ChisNibbles.Bits.CubeyParty
 import ChisNibbles.Bits.DependentPolys
